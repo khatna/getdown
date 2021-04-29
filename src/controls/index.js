@@ -1,3 +1,6 @@
+// Controls and basic physics. Code adapted from 
+// https://github.com/mrdoob/three.js/blob/master/examples/misc_controls_pointerlock.html
+
 import { Vector3 } from 'three';
 
 export class Controller {
@@ -8,9 +11,11 @@ export class Controller {
         this.moveBackward = false;
         this.moveLeft = false;
         this.moveRight = false;
+        this.jumping = false;
         this.document = document;
         this.controls = controls;
         this.prevTimestamp = -1;
+        this.startingY = controls.getObject().position.y;
 
         // Keyboard controls
         const onKeyDown = event => {
@@ -30,6 +35,12 @@ export class Controller {
                 case 'KeyD':
                     this.moveRight = true;
                     break;
+
+                case 'Space':
+                    if (!this.jumping) this.velocity.y += 100;
+                    this.jumping = true;
+                    break;
+
             }
         };
 
@@ -50,6 +61,9 @@ export class Controller {
                 case 'KeyD':
                     this.moveRight = false;
                     break;
+
+                case 'Space':
+                    this.jumping = false;
             }
         };
 
@@ -82,6 +96,16 @@ export class Controller {
 
             this.controls.moveRight(-this.velocity.x * delta);
             this.controls.moveForward(-this.velocity.z * delta);
+            
+            // gravity
+            this.velocity.y -= 9.8 * 50.0 * delta; // Mass = 100.0
+            this.controls.getObject().position.y += this.velocity.y * delta;
+            
+            // To be replaced with platform intersection logic
+            if (this.controls.getObject().position.y < this.startingY) {
+                this.velocity.y = 0;
+                this.controls.getObject().position.y = this.startingY;
+            }
         }
 
         this.prevTimestamp = timeStamp;
