@@ -29,8 +29,10 @@ document.body.style.margin = 0; // Removes margin around page
 document.body.style.overflow = 'hidden'; // Fix scrolling
 document.body.appendChild(canvas);
 
-// Pause
+// Pause and timekeeping
 let pause = true;
+let gameTimeStamp = 0;
+let prevTimeStamp = 0;
 
 // Set up camera control - click mouse to lock cursor and go to FPS mode
 const controls = new PointerLockControls(camera, canvas);
@@ -42,6 +44,7 @@ controls.addEventListener('lock', function () {
     scene.state.gui.hide();
 	hud.resumeGame();
     pause = false;
+    prevTimeStamp = 0;
     window.requestAnimationFrame(onAnimationFrameHandler);
 });
 
@@ -59,9 +62,12 @@ const hud = new Hud();
 
 // Render loop
 const onAnimationFrameHandler = (timeStamp) => {
+    if (prevTimeStamp > 0)
+        gameTimeStamp += timeStamp - prevTimeStamp;
+    prevTimeStamp = timeStamp;
     renderer.render(scene, camera);
-    scene.update && scene.update(timeStamp);
-    controller.update(timeStamp);
+    scene.update && scene.update(gameTimeStamp);
+    controller.update(gameTimeStamp);
     if (!pause) {
         window.requestAnimationFrame(onAnimationFrameHandler);
     }
