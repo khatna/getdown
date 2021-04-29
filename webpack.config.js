@@ -42,6 +42,10 @@ module.exports = {
                     },
                 ],
             },
+            {
+                test: /\.css$/i,
+                use: ['style-loader', 'css-loader'],
+            },
         ],
     },
     resolve: {
@@ -54,4 +58,5 @@ module.exports = {
     plugins: [
         new HtmlWebpackPlugin({ title: pkg.title, favicon: 'src/favicon.ico' }),
     ],
+    watch: true
 };

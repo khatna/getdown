@@ -10,6 +10,7 @@ import { WebGLRenderer, PerspectiveCamera, Vector3 } from 'three';
 import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls.js';
 import { SeedScene } from 'scenes';
 import { Controller } from './controls';
+import { Hud } from './hud';
 
 // Initialize core ThreeJS components
 const scene = new SeedScene();
@@ -28,23 +29,42 @@ document.body.style.margin = 0; // Removes margin around page
 document.body.style.overflow = 'hidden'; // Fix scrolling
 document.body.appendChild(canvas);
 
+// Pause
+let pause = true;
+
 // Set up camera control - click mouse to lock cursor and go to FPS mode
 const controls = new PointerLockControls(camera, canvas);
 document.body.addEventListener('click', function () {
     controls.lock();
 });
 
-// TODO: Show menu when cursor unlocked, hide menu when cursor locked
+controls.addEventListener('lock', function () {
+    scene.state.gui.hide();
+	hud.resumeGame();
+    pause = false;
+    window.requestAnimationFrame(onAnimationFrameHandler);
+});
+
+controls.addEventListener('unlock', function () {
+    scene.state.gui.show();
+    hud.pauseGame();
+    pause = true;
+});
 
 // Gameplay controller
 const controller = new Controller(document, controls);
+
+// HUD
+const hud = new Hud();
 
 // Render loop
 const onAnimationFrameHandler = (timeStamp) => {
     renderer.render(scene, camera);
     scene.update && scene.update(timeStamp);
     controller.update(timeStamp);
-    window.requestAnimationFrame(onAnimationFrameHandler);
+    if (!pause) {
+        window.requestAnimationFrame(onAnimationFrameHandler);
+    }
 };
 window.requestAnimationFrame(onAnimationFrameHandler);
 
