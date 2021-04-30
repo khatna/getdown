@@ -14,6 +14,10 @@ body {
     border-radius: 5px;
 }
 
+#debug {
+    bottom: 60px;
+}
+
 #score {
     display: block;
     position: absolute;

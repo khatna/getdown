@@ -77,6 +77,7 @@ const onAnimationFrameHandler = (timeStamp) => {
     renderer.render(scene, camera);
     scene.update && scene.update(gameTimeStamp);
     controller.update(gameTimeStamp);
+    hud.setDebugMsg(controller.velocity.z);
     if (!pause) {
         window.requestAnimationFrame(onAnimationFrameHandler);
     }

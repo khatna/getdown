@@ -11,6 +11,8 @@ export class Controller {
         this.moveBackward = false;
         this.moveLeft = false;
         this.moveRight = false;
+        this.moveUp = false;
+        this.moveDown = false;
         this.jumping = false;
         this.landed = true;
         this.document = document;
@@ -40,6 +42,14 @@ export class Controller {
                 case 'Space':
                     this.jump();
                     break;
+                
+                case 'ArrowUp':
+                    this.moveUp = true;
+                    break;
+
+                case 'ArrowDown':
+                    this.moveDown = true;
+                    break;
 
             }
         };
@@ -64,6 +74,16 @@ export class Controller {
 
                 case 'Space':
                     this.jumping = false;
+                    break;
+                
+                case 'ArrowUp':
+                    this.moveUp = false;
+                    break;
+
+                case 'ArrowDown':
+                    this.moveDown = false;
+                    break;
+    
             }
         };
 
@@ -85,7 +105,6 @@ export class Controller {
 
         if (this.controls.isLocked) {
             const delta = (timeStamp - this.prevTimestamp) / 1000;
-
             this.velocity.x -= this.velocity.x * 10.0 * delta;
             this.velocity.z -= this.velocity.z * 10.0 * delta;
 
@@ -112,6 +131,15 @@ export class Controller {
                 this.velocity.y = 0;
                 this.controls.getObject().position.y = this.startingY;
                 this.landed = true;
+            }
+
+            // Move up and down for debugging purposes
+            if (this.moveUp) {
+                this.controls.getObject().position.y += 5;
+                this.startingY = this.controls.getObject().position.y;
+            } else if (this.moveDown) {
+                this.controls.getObject().position.y -= 5;
+                this.startingY = this.controls.getObject().position.y;
             }
         }
 

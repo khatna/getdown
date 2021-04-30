@@ -30,6 +30,11 @@ export class Hud {
             '<div id="health" class="vertical-bar"><span>❤️</span></div>'
         ));
 
+        // Debug
+        $('body').append($(
+            '<div id="debug" class="hud-message">Debug</div>'
+        ));
+
     }
 
     resumeGame() {
@@ -44,5 +49,9 @@ export class Hud {
         clearTimeout(this.esc_key_timeout);
         $("#esc-hint").hide();
         $("#click-hint").css("display", "block");
+    }
+
+    setDebugMsg(s) {
+        $("#debug").text(s);
     }
 }
