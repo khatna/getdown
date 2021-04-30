@@ -13,7 +13,6 @@ import { Controller } from './controls';
 import { Hud } from './hud';
 
 // Initialize core ThreeJS components
-const scene = new SeedScene();
 const camera = new PerspectiveCamera();
 const renderer = new WebGLRenderer({ antialias: true });
 
@@ -36,6 +35,9 @@ let prevTimeStamp = 0;
 
 // Set up camera control - click mouse to lock cursor and go to FPS mode
 const controls = new PointerLockControls(camera, canvas);
+
+// Set up scene
+const scene = new SeedScene(controls);
 
 // Gameplay controller
 const controller = new Controller(document, controls);
@@ -77,7 +79,7 @@ const onAnimationFrameHandler = (timeStamp) => {
     renderer.render(scene, camera);
     scene.update && scene.update(gameTimeStamp);
     controller.update(gameTimeStamp);
-    hud.setDebugMsg(controller.velocity.z);
+    hud.setDebugMsg(controls.getObject().position.y);
     if (!pause) {
         window.requestAnimationFrame(onAnimationFrameHandler);
     }

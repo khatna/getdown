@@ -105,6 +105,7 @@ export class Controller {
 
         if (this.controls.isLocked) {
             const delta = (timeStamp - this.prevTimestamp) / 1000;
+
             this.velocity.x -= this.velocity.x * 10.0 * delta;
             this.velocity.z -= this.velocity.z * 10.0 * delta;
 

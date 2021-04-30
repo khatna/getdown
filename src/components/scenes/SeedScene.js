@@ -1,10 +1,15 @@
 import * as Dat from 'dat.gui';
-import { Scene, Color } from 'three';
+import {
+    Scene,
+    Color,
+    Fog,
+} from 'three';
 import { Flower, Land } from 'objects';
 import { BasicLights } from 'lights';
+import Cylinder from '../objects/Cylinder/Cylinder';
 
 class SeedScene extends Scene {
-    constructor() {
+    constructor(controls) {
         // Call parent Scene() constructor
         super();
 
@@ -15,8 +20,10 @@ class SeedScene extends Scene {
             updateList: [],
         };
 
-        // Set background to a nice color
-        this.background = new Color(0x7ec0ee);
+        // Background and fog
+        let background_and_fog_color = new Color(0x000000);
+        this.background =  background_and_fog_color;
+        this.fog = new Fog(background_and_fog_color, 100, 500);
 
         // Add meshes to scene
         const land = new Land();
@@ -24,8 +31,13 @@ class SeedScene extends Scene {
         const lights = new BasicLights();
         this.add(land, flower, lights);
 
+        // Cylinder
+        const cylinder = new Cylinder(controls);
+        this.add(cylinder);
+        this.addToUpdateList(cylinder);
+
         // Populate GUI
-        this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
+        // this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
     }
 
     addToUpdateList(object) {
@@ -34,7 +46,7 @@ class SeedScene extends Scene {
 
     update(timeStamp) {
         const { rotationSpeed, updateList } = this.state;
-        this.rotation.y = (rotationSpeed * timeStamp) / 10000;
+        // this.rotation.y = (rotationSpeed * timeStamp) / 10000;
 
         // Call update for each object in the updateList
         for (const obj of updateList) {
