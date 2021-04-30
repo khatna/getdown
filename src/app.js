@@ -36,13 +36,28 @@ let prevTimeStamp = 0;
 
 // Set up camera control - click mouse to lock cursor and go to FPS mode
 const controls = new PointerLockControls(camera, canvas);
-document.body.addEventListener('click', function () {
-    controls.lock();
+
+// Gameplay controller
+const controller = new Controller(document, controls);
+
+// HUD
+const hud = new Hud();
+
+document.body.addEventListener('mousedown', function () {
+    if (pause) {
+        controls.lock();
+    } else {
+        controller.jump();
+    }
+});
+
+document.body.addEventListener('mouseup', function () {
+    controller.jumping = false;
 });
 
 controls.addEventListener('lock', function () {
     scene.state.gui.hide();
-	hud.resumeGame();
+    hud.resumeGame();
     pause = false;
     prevTimeStamp = 0;
     window.requestAnimationFrame(onAnimationFrameHandler);
@@ -53,12 +68,6 @@ controls.addEventListener('unlock', function () {
     hud.pauseGame();
     pause = true;
 });
-
-// Gameplay controller
-const controller = new Controller(document, controls);
-
-// HUD
-const hud = new Hud();
 
 // Render loop
 const onAnimationFrameHandler = (timeStamp) => {

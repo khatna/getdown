@@ -12,6 +12,7 @@ export class Controller {
         this.moveLeft = false;
         this.moveRight = false;
         this.jumping = false;
+        this.landed = true;
         this.document = document;
         this.controls = controls;
         this.prevTimestamp = -1;
@@ -37,8 +38,7 @@ export class Controller {
                     break;
 
                 case 'Space':
-                    if (!this.jumping) this.velocity.y += 100;
-                    this.jumping = true;
+                    this.jump();
                     break;
 
             }
@@ -69,6 +69,12 @@ export class Controller {
 
         this.document.addEventListener('keydown', onKeyDown);
         this.document.addEventListener('keyup', onKeyUp);
+    }
+
+    jump() {
+        if (!this.jumping && this.landed) this.velocity.y += 100;
+        this.jumping = true;
+        this.landed = false;
     }
 
     update(timeStamp) {
@@ -105,6 +111,7 @@ export class Controller {
             if (this.controls.getObject().position.y < this.startingY) {
                 this.velocity.y = 0;
                 this.controls.getObject().position.y = this.startingY;
+                this.landed = true;
             }
         }
 
