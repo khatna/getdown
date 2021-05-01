@@ -41,6 +41,7 @@ class SeedScene extends Scene {
         const platforms = new Platforms(controls);
         this.add(platforms);
         this.addToUpdateList(platforms);
+        this.platforms = platforms.platforms;
 
         // Populate GUI
         // this.state.gui.add(this.state, 'rotationSpeed', -5, 5);

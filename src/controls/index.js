@@ -1,7 +1,7 @@
-// Controls and basic physics. Code adapted from 
+// Controls and basic physics. Code adapted from
 // https://github.com/mrdoob/three.js/blob/master/examples/misc_controls_pointerlock.html
 
-import { Vector3 } from 'three';
+import { Vector3, Raycaster, PerspectiveCamera } from 'three';
 
 export class Controller {
     constructor(document, controls) {
@@ -18,7 +18,13 @@ export class Controller {
         this.document = document;
         this.controls = controls;
         this.prevTimestamp = -1;
-        this.startingY = controls.getObject().position.y;
+        this.raycaster = new Raycaster(
+            new Vector3(),
+            new Vector3(0, -1, 0),
+            0, 5
+        );
+
+        this.gravityEnabled = false;
 
         // Keyboard controls
         const onKeyDown = event => {
@@ -42,7 +48,7 @@ export class Controller {
                 case 'Space':
                     this.jump();
                     break;
-                
+
                 case 'ArrowUp':
                     this.moveUp = true;
                     break;
@@ -50,7 +56,6 @@ export class Controller {
                 case 'ArrowDown':
                     this.moveDown = true;
                     break;
-
             }
         };
 
@@ -63,11 +68,11 @@ export class Controller {
                 case 'KeyA':
                     this.moveLeft = false;
                     break;
-                    
+
                 case 'KeyS':
                     this.moveBackward = false;
                     break;
-                    
+
                 case 'KeyD':
                     this.moveRight = false;
                     break;
@@ -75,7 +80,7 @@ export class Controller {
                 case 'Space':
                     this.jumping = false;
                     break;
-                
+
                 case 'ArrowUp':
                     this.moveUp = false;
                     break;
@@ -83,7 +88,6 @@ export class Controller {
                 case 'ArrowDown':
                     this.moveDown = false;
                     break;
-    
             }
         };
 
@@ -92,19 +96,19 @@ export class Controller {
     }
 
     jump() {
-        if (!this.jumping && this.landed) this.velocity.y += 40;
+        if (!this.jumping && this.landed) this.velocity.y += 100;
         this.jumping = true;
         this.landed = false;
     }
 
-    update(timeStamp) {
-        // there's definitely a better way to do this
+    update(timeStamp, scene) {
         if (this.prevTimestamp == -1) {
-            this.prevTimestamp = timeStamp - 16;
+            this.prevTimestamp = timeStamp;
         }
 
         if (this.controls.isLocked) {
             const delta = (timeStamp - this.prevTimestamp) / 1000;
+            let player = this.controls.getObject();
 
             this.velocity.x -= this.velocity.x * 10.0 * delta;
             this.velocity.z -= this.velocity.z * 10.0 * delta;
@@ -120,31 +124,33 @@ export class Controller {
                 this.velocity.x -= this.direction.x * 100.0 * delta;
             }
 
-            this.controls.moveRight(-this.velocity.x * delta);
-            this.controls.moveForward(-this.velocity.z * delta);
-            
             // gravity
-            this.velocity.y -= 9.8 * 10.0 * delta; // Mass = 100.0
-            this.controls.getObject().position.y += this.velocity.y * delta;
-            
-            // To be replaced with platform intersection logic
-            if (this.controls.getObject().position.y < this.startingY) {
+            this.velocity.y -= 9.8 * 20.0 * delta; // Mass = 20.0
+
+            // intersection
+            this.raycaster.ray.origin.copy(player.position);
+            let intersections = this.raycaster.intersectObjects(
+                scene.platforms
+            );
+            if (intersections.length > 0 && this.velocity.y < 0) {
                 this.velocity.y = 0;
-                this.controls.getObject().position.y = this.startingY;
                 this.landed = true;
             }
+
+            // movement
+            this.controls.moveRight(-this.velocity.x * delta);
+            this.controls.moveForward(-this.velocity.z * delta);
+            player.position.y += this.velocity.y * delta;
 
             // Move up and down for debugging purposes
             if (this.moveUp) {
                 this.controls.getObject().position.y += 5;
-                this.startingY = this.controls.getObject().position.y;
             } else if (this.moveDown) {
                 this.controls.getObject().position.y -= 5;
-                this.startingY = this.controls.getObject().position.y;
             }
-        }
 
-        this.prevTimestamp = timeStamp;
-        return;
-    } 
+            this.prevTimestamp = timeStamp;
+            return;
+        }
+    }
 }
