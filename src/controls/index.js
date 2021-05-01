@@ -92,7 +92,7 @@ export class Controller {
     }
 
     jump() {
-        if (!this.jumping && this.landed) this.velocity.y += 100;
+        if (!this.jumping && this.landed) this.velocity.y += 40;
         this.jumping = true;
         this.landed = false;
     }
@@ -114,17 +114,17 @@ export class Controller {
             this.direction.normalize(); // this ensures consistent movements in all directions
 
             if (this.moveForward || this.moveBackward) {
-                this.velocity.z -= this.direction.z * 400.0 * delta;
+                this.velocity.z -= this.direction.z * 100.0 * delta;
             }
             if (this.moveLeft || this.moveRight) {
-                this.velocity.x -= this.direction.x * 400.0 * delta;
+                this.velocity.x -= this.direction.x * 100.0 * delta;
             }
 
             this.controls.moveRight(-this.velocity.x * delta);
             this.controls.moveForward(-this.velocity.z * delta);
             
             // gravity
-            this.velocity.y -= 9.8 * 50.0 * delta; // Mass = 100.0
+            this.velocity.y -= 9.8 * 10.0 * delta; // Mass = 100.0
             this.controls.getObject().position.y += this.velocity.y * delta;
             
             // To be replaced with platform intersection logic
