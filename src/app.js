@@ -40,7 +40,7 @@ const controls = new PointerLockControls(camera, canvas);
 const scene = new SeedScene(controls);
 
 // Gameplay controller
-const controller = new Controller(document, controls);
+const controller = new Controller(document, controls, scene);
 
 // HUD
 const hud = new Hud();
@@ -78,7 +78,7 @@ const onAnimationFrameHandler = (timeStamp) => {
     prevTimeStamp = timeStamp;
     renderer.render(scene, camera);
     scene.update && scene.update(gameTimeStamp);
-    controller.update(gameTimeStamp, scene);
+    controller.update(gameTimeStamp);
     hud.setDebugMsg(controls.getObject().position.y);
     if (!pause) {
         window.requestAnimationFrame(onAnimationFrameHandler);

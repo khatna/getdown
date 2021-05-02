@@ -27,11 +27,12 @@ class Platforms extends Group {
             platform1.position.x -= 6;
             platform1.position.y -= 20;
             this.add(platform1);
+            this.platforms.push(platform1);
             let platform1b = this.platformOriginal.clone();
             platform1b.position.z -= 6;
             platform1b.position.y += 3;
             this.add(platform1b);
-            this.platforms.push(platform1);
+            this.platforms.push(platform1b);
             let platform2 = this.platformOriginal.clone();
             platform2.position.x += 12;
             this.add(platform2);

@@ -1,10 +1,10 @@
 // Controls and basic physics. Code adapted from
 // https://github.com/mrdoob/three.js/blob/master/examples/misc_controls_pointerlock.html
 
-import { Vector3, Raycaster, PerspectiveCamera } from 'three';
+import { Vector3, Raycaster, Box3 } from 'three';
 
 export class Controller {
-    constructor(document, controls) {
+    constructor(document, controls, scene) {
         this.velocity = new Vector3();
         this.direction = new Vector3();
         this.moveForward = false;
@@ -18,13 +18,8 @@ export class Controller {
         this.document = document;
         this.controls = controls;
         this.prevTimestamp = -1;
-        this.raycaster = new Raycaster(
-            new Vector3(),
-            new Vector3(0, -1, 0),
-            0, 5
-        );
-
-        this.gravityEnabled = false;
+        this.raycasters = [];
+        this.scene = scene;
 
         // Keyboard controls
         const onKeyDown = event => {
@@ -93,6 +88,59 @@ export class Controller {
 
         this.document.addEventListener('keydown', onKeyDown);
         this.document.addEventListener('keyup', onKeyUp);
+
+        // Initialize raycasters
+        this.initializeRaycasters();
+    }
+
+    initializeRaycasters() {
+        // center
+        this.raycasters.push(
+            new Raycaster(
+                this.controls.getObject().position,
+                new Vector3(0, -1, 0),
+                0, 5
+            )
+        );
+
+        // corners of bounding box
+        for (let i = 0; i < 5; i++) {
+            this.raycasters.push(
+                new Raycaster(
+                    new Vector3(),
+                    new Vector3(0, -1, 0),
+                    0, 5
+                )
+            );
+        }
+    }
+
+    // update the origin of each corner raycaster properly
+    updateRaycasters() {
+        for (let i = 0; i < 2; i++) {
+            for (let j = 0; j < 2; j++) {
+                let x = 2 * i - 1;
+                let z = 2 * j - 1;
+                let rc = this.raycasters[1 + i * 2 + j];
+                rc.ray.origin.copy(this.controls.getObject().position);
+                rc.ray.origin.x += x;
+                rc.ray.origin.z += z;
+            }
+        }
+    }
+
+    // check whether there is a collision (-y direction)
+    checkIntersections() {
+        let intersect = false;
+        for (let i = 0; i < 5; i++) {
+            let rc = this.raycasters[i];
+            let intersects = rc.intersectObjects(this.scene.platforms);
+            if (intersects.length > 0) {
+                intersect = true;
+                break;
+            }
+        }
+        return intersect;
     }
 
     jump() {
@@ -101,7 +149,7 @@ export class Controller {
         this.landed = false;
     }
 
-    update(timeStamp, scene) {
+    update(timeStamp) {
         if (this.prevTimestamp == -1) {
             this.prevTimestamp = timeStamp;
         }
@@ -118,23 +166,23 @@ export class Controller {
             this.direction.normalize(); // this ensures consistent movements in all directions
 
             if (this.moveForward || this.moveBackward) {
-                this.velocity.z -= this.direction.z * 100.0 * delta;
+                this.velocity.z -= this.direction.z * 200.0 * delta;
             }
             if (this.moveLeft || this.moveRight) {
-                this.velocity.x -= this.direction.x * 100.0 * delta;
+                this.velocity.x -= this.direction.x * 200.0 * delta;
             }
 
             // gravity
-            this.velocity.y -= 9.8 * 20.0 * delta; // Mass = 20.0
+            this.velocity.y -= 9.8 * 30.0 * delta; // Mass = 30.0
 
             // intersection
-            this.raycaster.ray.origin.copy(player.position);
-            let intersections = this.raycaster.intersectObjects(
-                scene.platforms
-            );
-            if (intersections.length > 0 && this.velocity.y < 0) {
+            this.updateRaycasters();
+            let intersect = this.checkIntersections();
+            if (intersect && this.velocity.y < 0) {
                 this.velocity.y = 0;
                 this.landed = true;
+            } else if (!intersect) {
+                this.landed = false;
             }
 
             // movement
