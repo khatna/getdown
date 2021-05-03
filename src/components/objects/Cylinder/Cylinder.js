@@ -11,7 +11,7 @@ import {
 class Cylinder extends Group {
     constructor(controls) {
         super();
-        const geometry = new CylinderGeometry(80, 80, 1000, 32, 1, true);
+        const geometry = new CylinderGeometry(120, 120, 1000, 32, 1, true);
         const texture = new TextureLoader().load('/src/components/assets/wall.jpg')
         texture.wrapS = RepeatWrapping;
         texture.wrapT = RepeatWrapping;

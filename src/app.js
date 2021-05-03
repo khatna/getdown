@@ -13,7 +13,7 @@ import { Controller } from './controls';
 import { Hud } from './hud';
 
 // Initialize core ThreeJS components
-const camera = new PerspectiveCamera();
+const camera = new PerspectiveCamera(60, 1, 0.001);
 const renderer = new WebGLRenderer({ antialias: true });
 
 // Set up camera
