@@ -42,6 +42,7 @@ class SeedScene extends Scene {
         const ceiling = new Ceiling(controls);
         this.add(ceiling);
         this.addToUpdateList(ceiling);
+        this.ceiling = ceiling.ceiling;
 
         // Platforms
         const platforms = new Platforms(controls, ceiling.ceiling);
@@ -51,8 +52,6 @@ class SeedScene extends Scene {
 
         // Populate GUI
         // this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
-
-        this.healthAdjustment = 0;
     }
 
     addToUpdateList(object) {
@@ -67,9 +66,6 @@ class SeedScene extends Scene {
         for (const obj of updateList) {
             obj.update(timeStamp);
         }
-
-        // Check for health adjustments
-        // TODO
     }
 }
 

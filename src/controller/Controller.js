@@ -25,6 +25,8 @@ class Controller {
         this.bottomRaycasters = [];
         this.topRaycasters = [];
         this.scene = scene;
+        this.fallDistance = 0;
+        this.landedHeight = null;
 
         // Keyboard controls
         const onKeyDown = event => {
@@ -164,7 +166,9 @@ class Controller {
         let intersects = [];
         for (let i = 0; i < 5; i++) {
             let rc = rcs[i];
-            intersects = rc.intersectObjects(this.scene.platforms.collision);
+            let collision = [...this.scene.platforms.collision];
+            collision.push(this.scene.ceiling);
+            intersects = rc.intersectObjects(collision);
             if (intersects.length > 0) {
                 break;
             }
@@ -212,7 +216,14 @@ class Controller {
                 let diff = 3 - dist;
                 player.position.y += diff;
                 this.velocity.y = 0;
-                this.landed = true;
+                if (this.landedHeight === null) {
+                    this.landedHeight = player.position.y;
+                }
+                if (!this.landed) {
+                    this.fallDistance = this.landedHeight - player.position.y;
+                    this.landedHeight = player.position.y;
+                    this.landed = true;
+                }
             } else if (intersects.length == 0) {
                 this.landed = false;
             }
@@ -229,11 +240,11 @@ class Controller {
             player.position.y += this.velocity.y * delta;
 
             // Move up and down for debugging purposes
-            if (this.moveUp) {
-                this.controls.getObject().position.y += 5;
-            } else if (this.moveDown) {
-                this.controls.getObject().position.y -= 5;
-            }
+            // if (this.moveUp) {
+            //     this.controls.getObject().position.y += 5;
+            // } else if (this.moveDown) {
+            //     this.controls.getObject().position.y -= 5;
+            // }
 
             this.prevTimestamp = timeStamp;
             return;
