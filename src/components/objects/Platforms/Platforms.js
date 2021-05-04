@@ -9,7 +9,7 @@ import {
 } from 'three';
 
 class Platforms extends Group {
-    constructor(controls) {
+    constructor(controls, ceiling) {
         super();
 
         // Properties of platforms
@@ -32,6 +32,7 @@ class Platforms extends Group {
         this.spawnIntervalY = 1000;
 
         this.controls = controls;
+        this.ceiling = ceiling;
         this.initialized = false;
 
         let platformMaterial = new MeshPhongMaterial({color: 0x333333, side: DoubleSide});
@@ -140,6 +141,16 @@ class Platforms extends Group {
                 }
             }
         }
+        // Remove platforms
+        for (let i = this.p.display.length - this.platformsPerIteration - 1; i >= 0; i--) {
+            if (this.p.display[i].position.y > this.ceiling.position.y) {
+                this.remove(this.p.display[i]);
+                this.p.display.splice(i, 1);
+                this.p.collision.splice(i, 1);
+                this.p.space.splice(i, 1);
+            }
+        }
+        // Add platforms
         if (!this.initialized || this.controls.getObject().position.y < this.spawnMoreTriggerY) {
             let stop = false;
             while (!stop) {

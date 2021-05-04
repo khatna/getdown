@@ -71,13 +71,25 @@ controls.addEventListener('unlock', function () {
     pause = true;
 });
 
+// Health
+let health = 1.0;
+let gameOver = false;
+const calculateHealth = (adjustment) => {
+    health = Math.max(0, Math.min(1, health + adjustment));
+    if (health == 0) {
+        gameOver = true;
+    }
+}
+
 // Render loop
 const onAnimationFrameHandler = (timeStamp) => {
     if (prevTimeStamp > 0)
         gameTimeStamp += timeStamp - prevTimeStamp;
     prevTimeStamp = timeStamp;
     renderer.render(scene, camera);
-    scene.update && scene.update(gameTimeStamp);
+    if (!gameOver) {
+        scene.update && scene.update(gameTimeStamp);
+    }
     controller.update(gameTimeStamp);
     hud.setDebugMsg(controls.getObject().position.y);
     if (!pause) {
