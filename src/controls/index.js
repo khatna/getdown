@@ -3,6 +3,10 @@
 
 import { Vector3, Raycaster, Box3 } from 'three';
 
+// size of player's body
+const BODY_SIZE = 2;
+
+// Controller class
 export class Controller {
     constructor(document, controls, scene) {
         this.velocity = new Vector3();
@@ -18,7 +22,8 @@ export class Controller {
         this.document = document;
         this.controls = controls;
         this.prevTimestamp = -1;
-        this.raycasters = [];
+        this.bottomRaycasters = [];
+        this.topRaycasters = [];
         this.scene = scene;
 
         // Keyboard controls
@@ -94,8 +99,8 @@ export class Controller {
     }
 
     initializeRaycasters() {
-        // center
-        this.raycasters.push(
+        // center bottom, top
+        this.bottomRaycasters.push(
             new Raycaster(
                 this.controls.getObject().position,
                 new Vector3(0, -1, 0),
@@ -103,13 +108,28 @@ export class Controller {
             )
         );
 
+        this.topRaycasters.push(
+            new Raycaster(
+                this.controls.getObject().position,
+                new Vector3(0, 1, 0),
+                0, 1
+            )
+        );
+
         // corners of bounding box
         for (let i = 0; i < 5; i++) {
-            this.raycasters.push(
+            this.bottomRaycasters.push(
                 new Raycaster(
                     new Vector3(),
                     new Vector3(0, -1, 0),
                     0, 5
+                )
+            );
+            this.topRaycasters.push(
+                new Raycaster(
+                    new Vector3(),
+                    new Vector3(0, 1, 0),
+                    0, 1
                 )
             );
         }
@@ -119,28 +139,37 @@ export class Controller {
     updateRaycasters() {
         for (let i = 0; i < 2; i++) {
             for (let j = 0; j < 2; j++) {
-                let x = 2 * i - 1;
-                let z = 2 * j - 1;
-                let rc = this.raycasters[1 + i * 2 + j];
-                rc.ray.origin.copy(this.controls.getObject().position);
-                rc.ray.origin.x += x;
-                rc.ray.origin.z += z;
+                let dx = (2 * i - 1) * BODY_SIZE / 2;
+                let dz = (2 * j - 1) * BODY_SIZE / 2;
+                let brc = this.bottomRaycasters[1 + i * 2 + j];
+                let trc = this.topRaycasters[1 + i * 2 + j];
+                brc.ray.origin.copy(this.controls.getObject().position);
+                trc.ray.origin.copy(this.controls.getObject().position);
+                brc.ray.origin.x += dx;
+                brc.ray.origin.z += dz;
+                trc.ray.origin.x += dx;
+                trc.ray.origin.z += dz;
             }
         }
     }
 
     // check whether there is a collision (-y direction)
-    checkIntersections() {
-        let intersect = false;
+    getIntersections(top = false) {
+        let rcs;
+        if (top)
+            rcs = this.topRaycasters;
+        else
+            rcs = this.bottomRaycasters;
+        
+        let intersects = [];
         for (let i = 0; i < 5; i++) {
-            let rc = this.raycasters[i];
-            let intersects = rc.intersectObjects(this.scene.platforms.collision);
+            let rc = rcs[i];
+            intersects = rc.intersectObjects(this.scene.platforms.collision);
             if (intersects.length > 0) {
-                intersect = true;
                 break;
             }
         }
-        return intersect;
+        return intersects;
     }
 
     jump() {
@@ -175,14 +204,23 @@ export class Controller {
             // gravity
             this.velocity.y -= 9.8 * 10.0 * delta; // Mass = 30.0
 
-            // intersection
+            // intersection - bottom
             this.updateRaycasters();
-            let intersect = this.checkIntersections();
-            if (intersect && this.velocity.y < 0) {
+            let intersects = this.getIntersections();
+            if (intersects.length > 0 && this.velocity.y < 0) {
+                let dist = intersects[0].distance;
+                let diff = 3 - dist;
+                player.position.y += diff;
                 this.velocity.y = 0;
                 this.landed = true;
-            } else if (!intersect) {
+            } else if (intersects.length == 0) {
                 this.landed = false;
+            }
+
+            // intersection - top
+            intersects = this.getIntersections(true);
+            if (intersects.length > 0 && this.velocity.y > 0) {
+                this.velocity.y *= -1; // perfect bounce
             }
 
             // movement
