@@ -3,6 +3,10 @@
 
 import { Vector3, Raycaster, Box3 } from 'three';
 
+// size of player's body
+const BODY_SIZE = 2;
+
+// Controller class
 export class Controller {
     constructor(document, controls, scene) {
         this.velocity = new Vector3();
@@ -19,6 +23,7 @@ export class Controller {
         this.controls = controls;
         this.prevTimestamp = -1;
         this.bottomRaycasters = [];
+        this.topRaycasters = [];
         this.scene = scene;
 
         // Keyboard controls
@@ -94,12 +99,20 @@ export class Controller {
     }
 
     initializeRaycasters() {
-        // center
+        // center bottom, top
         this.bottomRaycasters.push(
             new Raycaster(
                 this.controls.getObject().position,
                 new Vector3(0, -1, 0),
                 0, 5
+            )
+        );
+
+        this.topRaycasters.push(
+            new Raycaster(
+                this.controls.getObject().position,
+                new Vector3(0, 1, 0),
+                0, 1
             )
         );
 
@@ -112,6 +125,13 @@ export class Controller {
                     0, 5
                 )
             );
+            this.topRaycasters.push(
+                new Raycaster(
+                    new Vector3(),
+                    new Vector3(0, 1, 0),
+                    0, 1
+                )
+            );
         }
     }
 
@@ -119,21 +139,31 @@ export class Controller {
     updateRaycasters() {
         for (let i = 0; i < 2; i++) {
             for (let j = 0; j < 2; j++) {
-                let x = 2 * i - 1;
-                let z = 2 * j - 1;
-                let rc = this.bottomRaycasters[1 + i * 2 + j];
-                rc.ray.origin.copy(this.controls.getObject().position);
-                rc.ray.origin.x += x;
-                rc.ray.origin.z += z;
+                let dx = (2 * i - 1) * BODY_SIZE / 2;
+                let dz = (2 * j - 1) * BODY_SIZE / 2;
+                let brc = this.bottomRaycasters[1 + i * 2 + j];
+                let trc = this.topRaycasters[1 + i * 2 + j];
+                brc.ray.origin.copy(this.controls.getObject().position);
+                trc.ray.origin.copy(this.controls.getObject().position);
+                brc.ray.origin.x += dx;
+                brc.ray.origin.z += dz;
+                trc.ray.origin.x += dx;
+                trc.ray.origin.z += dz;
             }
         }
     }
 
     // check whether there is a collision (-y direction)
-    getIntersections() {
+    getIntersections(top = false) {
+        let rcs;
+        if (top)
+            rcs = this.topRaycasters;
+        else
+            rcs = this.bottomRaycasters;
+        
         let intersects = [];
         for (let i = 0; i < 5; i++) {
-            let rc = this.bottomRaycasters[i];
+            let rc = rcs[i];
             intersects = rc.intersectObjects(this.scene.platforms);
             if (intersects.length > 0) {
                 break;
@@ -174,7 +204,7 @@ export class Controller {
             // gravity
             this.velocity.y -= 9.8 * 30.0 * delta; // Mass = 30.0
 
-            // intersection
+            // intersection - bottom
             this.updateRaycasters();
             let intersects = this.getIntersections();
             if (intersects.length > 0 && this.velocity.y < 0) {
@@ -185,6 +215,12 @@ export class Controller {
                 this.landed = true;
             } else if (intersects.length == 0) {
                 this.landed = false;
+            }
+
+            // intersection - top
+            intersects = this.getIntersections(true);
+            if (intersects.length > 0) {
+                this.velocity.y *= -1; // perfect bounce
             }
 
             // movement
