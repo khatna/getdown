@@ -11,11 +11,11 @@ import {
 class Cylinder extends Group {
     constructor(controls) {
         super();
-        const geometry = new CylinderGeometry(80, 80, 1000, 32, 1, true);
+        const geometry = new CylinderGeometry(150, 150, 1000, 32, 1, true);
         const texture = new TextureLoader().load('/src/components/assets/wall.jpg')
         texture.wrapS = RepeatWrapping;
         texture.wrapT = RepeatWrapping;
-        texture.repeat.set(6, 12);
+        texture.repeat.set(12, 12);
         const material = new MeshBasicMaterial({color:0x003080, side: BackSide, map: texture});
         this.cylinderOriginal = new Mesh(geometry, material);
         this.controls = controls;

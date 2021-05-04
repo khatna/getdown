@@ -164,7 +164,7 @@ export class Controller {
         let intersects = [];
         for (let i = 0; i < 5; i++) {
             let rc = rcs[i];
-            intersects = rc.intersectObjects(this.scene.platforms);
+            intersects = rc.intersectObjects(this.scene.platforms.collision);
             if (intersects.length > 0) {
                 break;
             }
@@ -173,7 +173,7 @@ export class Controller {
     }
 
     jump() {
-        if (!this.jumping && this.landed) this.velocity.y += 100;
+        if (!this.jumping && this.landed) this.velocity.y += 40;
         this.jumping = true;
         this.landed = false;
     }
@@ -202,7 +202,7 @@ export class Controller {
             }
 
             // gravity
-            this.velocity.y -= 9.8 * 30.0 * delta; // Mass = 30.0
+            this.velocity.y -= 9.8 * 10.0 * delta; // Mass = 30.0
 
             // intersection - bottom
             this.updateRaycasters();
