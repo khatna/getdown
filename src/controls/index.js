@@ -219,7 +219,7 @@ export class Controller {
 
             // intersection - top
             intersects = this.getIntersections(true);
-            if (intersects.length > 0) {
+            if (intersects.length > 0 && this.velocity.y > 0) {
                 this.velocity.y *= -1; // perfect bounce
             }
 
