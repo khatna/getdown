@@ -18,7 +18,7 @@ export class Controller {
         this.document = document;
         this.controls = controls;
         this.prevTimestamp = -1;
-        this.raycasters = [];
+        this.bottomRaycasters = [];
         this.scene = scene;
 
         // Keyboard controls
@@ -95,7 +95,7 @@ export class Controller {
 
     initializeRaycasters() {
         // center
-        this.raycasters.push(
+        this.bottomRaycasters.push(
             new Raycaster(
                 this.controls.getObject().position,
                 new Vector3(0, -1, 0),
@@ -105,7 +105,7 @@ export class Controller {
 
         // corners of bounding box
         for (let i = 0; i < 5; i++) {
-            this.raycasters.push(
+            this.bottomRaycasters.push(
                 new Raycaster(
                     new Vector3(),
                     new Vector3(0, -1, 0),
@@ -121,7 +121,7 @@ export class Controller {
             for (let j = 0; j < 2; j++) {
                 let x = 2 * i - 1;
                 let z = 2 * j - 1;
-                let rc = this.raycasters[1 + i * 2 + j];
+                let rc = this.bottomRaycasters[1 + i * 2 + j];
                 rc.ray.origin.copy(this.controls.getObject().position);
                 rc.ray.origin.x += x;
                 rc.ray.origin.z += z;
@@ -130,17 +130,16 @@ export class Controller {
     }
 
     // check whether there is a collision (-y direction)
-    checkIntersections() {
-        let intersect = false;
+    getIntersections() {
+        let intersects = [];
         for (let i = 0; i < 5; i++) {
-            let rc = this.raycasters[i];
-            let intersects = rc.intersectObjects(this.scene.platforms);
+            let rc = this.bottomRaycasters[i];
+            intersects = rc.intersectObjects(this.scene.platforms);
             if (intersects.length > 0) {
-                intersect = true;
                 break;
             }
         }
-        return intersect;
+        return intersects;
     }
 
     jump() {
@@ -177,11 +176,14 @@ export class Controller {
 
             // intersection
             this.updateRaycasters();
-            let intersect = this.checkIntersections();
-            if (intersect && this.velocity.y < 0) {
+            let intersects = this.getIntersections();
+            if (intersects.length > 0 && this.velocity.y < 0) {
+                let dist = intersects[0].distance;
+                let diff = 3 - dist;
+                player.position.y += diff;
                 this.velocity.y = 0;
                 this.landed = true;
-            } else if (!intersect) {
+            } else if (intersects.length == 0) {
                 this.landed = false;
             }
 
