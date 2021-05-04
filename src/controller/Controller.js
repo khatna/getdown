@@ -7,7 +7,7 @@ import { Vector3, Raycaster, Box3 } from 'three';
 const BODY_SIZE = 2;
 
 // Controller class
-export class Controller {
+class Controller {
     constructor(document, controls, scene) {
         this.velocity = new Vector3();
         this.direction = new Vector3();
@@ -240,3 +240,5 @@ export class Controller {
         }
     }
 }
+
+export default Controller;

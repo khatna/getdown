@@ -9,7 +9,7 @@
 import { WebGLRenderer, PerspectiveCamera, Vector3 } from 'three';
 import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls.js';
 import { SeedScene } from 'scenes';
-import { Controller } from './controls';
+import { Controller } from './controller';
 import { Hud } from './hud';
 
 // Initialize core ThreeJS components
