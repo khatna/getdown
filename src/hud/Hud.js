@@ -45,6 +45,17 @@ class Hud {
             '<div id="debug" class="hud-message">Debug</div>'
         ));
 
+        // Falling cover
+        $('body').append($(
+            '<div id="falling" class="cover"></div>'
+        ));
+
+        // Damage cover
+        $('body').append($(
+            '<div id="damage" class="cover"></div>'
+        ));
+        $("#damage").hide();
+
     }
 
     resumeGame() {
@@ -72,7 +83,7 @@ class Hud {
         // Score up
         let score = this.score;
         let left = 40;
-        while (score > 1) {
+        while (score >= 1) {
             score /= 10;
             left += 40;
         }
@@ -129,9 +140,19 @@ class Hud {
     }
 
     gameOver() {
-        $("#esc-hint").text("🛈 Game over");
-        $("#click-hint").text("🛈 Game over");
+        $("#esc-hint").text("🛈 Game over; click to reload");
+        $("#click-hint").text("🛈 Game over; click to reload");
         $("#esc-hint").show();
+    }
+
+    setFallingCoverOpacity(opacity) {
+        $("#falling").css("opacity", opacity);
+    }
+
+    setDamageCoverOpacity(opacity) {
+        $("#damage").css("opacity", opacity);
+        $("#damage").show();
+        $("#damage").fadeOut();
     }
 }
 

@@ -47,7 +47,9 @@ const controller = new Controller(document, controls, scene);
 const hud = new Hud();
 
 document.body.addEventListener('mousedown', function () {
-    if (pause) {
+    if (gameOver) {
+        location.reload();
+    } else if (pause) {
         controls.lock();
     } else {
         controller.jump();
@@ -75,14 +77,21 @@ controls.addEventListener('unlock', function () {
 // Health
 let health = 1.0;
 let gameOver = false;
+const fallDamageFactor = 0.01;
+const fallDamageThreshold = 5 * 8.29;
 const calculateHealth = () => {
-    const fallDamageFactor = 0.01;
-    const fallDamageThreshold = 5 * 8.29;
     let adjustment = 0;
     // Fall damage
     adjustment -= Math.max(0, fallDamageFactor * (controller.fallDistance - fallDamageThreshold));
+    if (adjustment < 0) {
+        hud.setDamageCoverOpacity(-adjustment * 4);
+    }
     // Ceiling damage
     if (controller.landed && controls.getObject().position.y + 2 >= scene.ceiling.position.y) {
+        adjustment = -1.0;
+    }
+    // Automatic game over
+    if ((controller.landedHeight - controls.getObject().position.y - fallDamageThreshold) * fallDamageFactor >= 1.0) {
         adjustment = -1.0;
     }
     health = Math.max(0, Math.min(1, health + adjustment));
@@ -109,9 +118,11 @@ const onAnimationFrameHandler = (timeStamp) => {
     if (!gameOver && controller.fallDistance > 0) {
         hud.addFallDistanceToScore(controller.fallDistance);
     }
+    controller.fallDistance = 0;
     hud.updateHealth(health);
     hud.updateCeilingDistance(scene.ceiling.position.y - (controls.getObject().position.y + 2));
-    controller.fallDistance = 0;
+    hud.setFallingCoverOpacity(Math.max(0, Math.min(
+        1, (controller.landedHeight - controls.getObject().position.y - fallDamageThreshold) / 100)));
     if (!pause || gameTimeStamp - startTimeStamp < 200) {
         window.requestAnimationFrame(onAnimationFrameHandler);
     }
