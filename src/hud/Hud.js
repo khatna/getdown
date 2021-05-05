@@ -1,8 +1,12 @@
 import $ from "jquery";
 import "./styles.css";
 
+const scorePerFallDistanceUnit = 1.75 / 5;
+
 class Hud {
     constructor() {
+
+        this.score = 0;
 
         // Escape key hint
         $('body').append($(
@@ -19,6 +23,12 @@ class Hud {
         $('body').append($(
             '<div id="score"><span id="value">0</span><span id="unit">m</span></div>'
         ));
+
+        // Score up
+        $('body').append($(
+            '<div id="score-up">+000</div>'
+        ));
+        $("#score-up").hide();
 
         // Ceiling distance bar
         $('body').append($(
@@ -38,21 +48,90 @@ class Hud {
     }
 
     resumeGame() {
-        $("#esc-hint").css("display", "block");
-        this.esc_key_timeout = setTimeout(function () {
+        $("#esc-hint").show();
+        this.escKeyTimeout = setTimeout(function () {
             $("#esc-hint").hide();
         }, 3000);
         $("#click-hint").hide();
     }
 
     pauseGame() {
-        clearTimeout(this.esc_key_timeout);
+        clearTimeout(this.escKeyTimeout);
         $("#esc-hint").hide();
-        $("#click-hint").css("display", "block");
+        $("#click-hint").show();
     }
 
     setDebugMsg(s) {
         $("#debug").text(s);
+    }
+
+    addFallDistanceToScore(fallDistance) {
+        let scoreUp = Math.round(fallDistance * scorePerFallDistanceUnit);
+        this.score += scoreUp
+        $("#score #value").text(this.score);
+        // Score up
+        let score = this.score;
+        let left = 40;
+        while (score > 1) {
+            score /= 10;
+            left += 40;
+        }
+        clearTimeout(this.scoreUpTimeout);
+        $("#score-up").css("left", left + "px");
+        $("#score-up").show();
+        $("#score-up").text("+" + scoreUp);
+        this.scoreUpTimeout = setTimeout(function () {
+            $("#score-up").hide();
+        }, 3000);
+    }
+
+    updateHealth(health) {
+        health *= 100;
+        let colorTop = "rgba(58,255,0,1)";
+        let colorBottom = "rgba(13,140,0,1)";
+        let colorBack = "rgba(77,77,77,1)";
+        $('#health').css(
+            'background',
+            'linear-gradient(0deg, ' +
+                colorBottom +
+                ' 0%, ' +
+                colorTop +
+                ' ' +
+                health +
+                '%, ' +
+                colorBack +
+                ' ' +
+                health +
+                '%)'
+        );
+    }
+
+    updateCeilingDistance(ceilingDistance) {
+        // Ref: https://cssgradient.io
+        ceilingDistance = Math.min(100, ceilingDistance);
+        let colorTop = "rgba(140,0,0,1)";
+        let colorBottom = "rgba(255,0,0,1)";
+        let colorBack = "rgba(77,77,77,1)";
+        $('#distance').css(
+            'background',
+            'linear-gradient(0deg, ' +
+                colorBack +
+                ' ' +
+                ceilingDistance +
+                '%, ' +
+                colorBottom +
+                ' ' +
+                ceilingDistance +
+                '%, ' +
+                colorTop +
+                ' 100%)'
+        );
+    }
+
+    gameOver() {
+        $("#esc-hint").text("🛈 Game over");
+        $("#click-hint").text("🛈 Game over");
+        $("#esc-hint").show();
     }
 }
 

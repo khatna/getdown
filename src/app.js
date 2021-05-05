@@ -31,7 +31,8 @@ document.body.appendChild(canvas);
 // Pause and timekeeping
 let pause = true;
 let gameTimeStamp = 0;
-let prevTimeStamp = 0;
+let prevTimeStamp = null;
+let startTimeStamp = null;
 
 // Set up camera control - click mouse to lock cursor and go to FPS mode
 const controls = new PointerLockControls(camera, canvas);
@@ -61,7 +62,7 @@ controls.addEventListener('lock', function () {
     scene.state.gui.hide();
     hud.resumeGame();
     pause = false;
-    prevTimeStamp = 0;
+    prevTimeStamp = null;
     window.requestAnimationFrame(onAnimationFrameHandler);
 });
 
@@ -74,25 +75,44 @@ controls.addEventListener('unlock', function () {
 // Health
 let health = 1.0;
 let gameOver = false;
-const calculateHealth = (adjustment) => {
+const calculateHealth = () => {
+    const fallDamageFactor = 0.01;
+    const fallDamageThreshold = 5 * 8.29;
+    let adjustment = 0;
+    // Fall damage
+    adjustment -= Math.max(0, fallDamageFactor * (controller.fallDistance - fallDamageThreshold));
+    // Ceiling damage
+    if (controller.landed && controls.getObject().position.y + 2 >= scene.ceiling.position.y) {
+        adjustment = -1.0;
+    }
     health = Math.max(0, Math.min(1, health + adjustment));
     if (health == 0) {
         gameOver = true;
+        hud.gameOver();
     }
 }
 
 // Render loop
 const onAnimationFrameHandler = (timeStamp) => {
-    if (prevTimeStamp > 0)
+    if (startTimeStamp === null)
+        startTimeStamp = timeStamp;
+    if (prevTimeStamp !== null)
         gameTimeStamp += timeStamp - prevTimeStamp;
     prevTimeStamp = timeStamp;
     renderer.render(scene, camera);
     if (!gameOver) {
         scene.update && scene.update(gameTimeStamp);
+        controller.update(gameTimeStamp);
     }
-    controller.update(gameTimeStamp);
-    hud.setDebugMsg(controls.getObject().position.y);
-    if (!pause) {
+    hud.setDebugMsg(controller.fallDistance);
+    calculateHealth();
+    if (!gameOver && controller.fallDistance > 0) {
+        hud.addFallDistanceToScore(controller.fallDistance);
+    }
+    hud.updateHealth(health);
+    hud.updateCeilingDistance(scene.ceiling.position.y - (controls.getObject().position.y + 2));
+    controller.fallDistance = 0;
+    if (!pause || gameTimeStamp - startTimeStamp < 200) {
         window.requestAnimationFrame(onAnimationFrameHandler);
     }
 };
