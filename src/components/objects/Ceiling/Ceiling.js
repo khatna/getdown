@@ -18,6 +18,7 @@ class Ceiling extends Group {
         this.add(this.ceiling);
         this.prevTimestamp = -1;
         this.distance = 0;
+        this.speed = 0;
 
         // Parameters
         this.baseSpeed = 0.0001;
@@ -30,13 +31,15 @@ class Ceiling extends Group {
             this.prevTimestamp = timeStamp;
         }
 
-        const delta = (timeStamp - this.prevTimestamp) / 1000;
+        const delta = (timeStamp - this.prevTimestamp) / 5000;
         this.distance = this.ceiling.position.y - this.controls.getObject().position.y;
 
-        this.ceiling.position.y -=
-            this.baseSpeed +
+        this.speed =
+            (this.baseSpeed +
             this.timeStampFactor * Math.sqrt(timeStamp) +
-            this.distanceFactor * this.distance;
+            this.distanceFactor * this.distance) * delta;
+        
+        this.ceiling.position.y -= this.speed;
     }
 }
 
