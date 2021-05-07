@@ -9,6 +9,7 @@ import { BasicLights } from 'lights';
 import { Cylinder } from '../objects/Cylinder';
 import { Platforms } from '../objects/Platforms';
 import { Ceiling } from '../objects/Ceiling';
+import { Particles } from '../objects/Particles';
 
 class SeedScene extends Scene {
     constructor(controls) {
@@ -49,6 +50,11 @@ class SeedScene extends Scene {
         this.add(platforms);
         this.addToUpdateList(platforms);
         this.platforms = platforms.p;
+
+        // Particles
+        const particles = new Particles(controls);
+        this.add(particles);
+        this.addToUpdateList(particles);
 
         // Populate GUI
         // this.state.gui.add(this.state, 'rotationSpeed', -5, 5);

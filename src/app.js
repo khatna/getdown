@@ -47,9 +47,7 @@ const controller = new Controller(document, controls, scene);
 const hud = new Hud();
 
 document.body.addEventListener('mousedown', function () {
-    if (gameOver) {
-        location.reload();
-    } else if (pause) {
+    if (pause) {
         controls.lock();
     } else {
         controller.jump();
@@ -58,6 +56,12 @@ document.body.addEventListener('mousedown', function () {
 
 document.body.addEventListener('mouseup', function () {
     controller.jumping = false;
+});
+
+document.body.addEventListener('dblclick', function () {
+    if (gameOver) {
+        location.reload();
+    }
 });
 
 controls.addEventListener('lock', function () {
@@ -91,7 +95,7 @@ const calculateHealth = () => {
         adjustment = -1.0;
     }
     // Automatic game over
-    if ((controller.landedHeight - controls.getObject().position.y - fallDamageThreshold) * fallDamageFactor >= 1.0) {
+    if ((controller.landedHeight - controls.getObject().position.y - fallDamageThreshold) * fallDamageFactor >= 1.5) {
         adjustment = -1.0;
     }
     health = Math.max(0, Math.min(1, health + adjustment));
@@ -113,7 +117,7 @@ const onAnimationFrameHandler = (timeStamp) => {
         scene.update && scene.update(gameTimeStamp);
         controller.update(gameTimeStamp);
     }
-    hud.setDebugMsg(controller.fallDistance);
+    hud.setDebugMsg(controller.velocity.z);
     calculateHealth();
     if (!gameOver && controller.fallDistance > 0) {
         hud.addFallDistanceToScore(controller.fallDistance);
@@ -122,7 +126,7 @@ const onAnimationFrameHandler = (timeStamp) => {
     hud.updateHealth(health);
     hud.updateCeilingDistance(scene.ceiling.position.y - (controls.getObject().position.y + 2));
     hud.setFallingCoverOpacity(Math.max(0, Math.min(
-        1, (controller.landedHeight - controls.getObject().position.y - fallDamageThreshold) / 100)));
+        1, (controller.landedHeight - controls.getObject().position.y - fallDamageThreshold) / 150)));
     if (!pause || gameTimeStamp - startTimeStamp < 200) {
         window.requestAnimationFrame(onAnimationFrameHandler);
     }

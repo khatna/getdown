@@ -140,8 +140,8 @@ class Hud {
     }
 
     gameOver() {
-        $("#esc-hint").text("🛈 Game over; click to reload");
-        $("#click-hint").text("🛈 Game over; click to reload");
+        $("#esc-hint").text("🛈 Game over; double-click to reload");
+        $("#click-hint").text("🛈 Game over; double-click to reload");
         $("#esc-hint").show();
     }
 

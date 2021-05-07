@@ -22,7 +22,7 @@ class Ceiling extends Group {
 
         // Parameters
         this.baseSpeed = 0.0001;
-        this.timeStampFactor = 0.001;
+        this.timeStampFactor = 0.0002;
         this.distanceFactor = 0.001;
     }
 
