@@ -11,6 +11,7 @@ import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockCont
 import { SeedScene } from 'scenes';
 import { Controller } from './controller';
 import { Hud } from './hud';
+import { animateDeath } from './controller/deathAnimation';
 
 // Initialize core ThreeJS components
 const camera = new PerspectiveCamera(60, 1, 0.001);
@@ -116,7 +117,10 @@ const onAnimationFrameHandler = (timeStamp) => {
     if (!gameOver) {
         scene.update && scene.update(gameTimeStamp);
         controller.update(gameTimeStamp);
+    } else {
+        animateDeath(camera);
     }
+
     hud.setDebugMsg(controller.velocity.z);
     calculateHealth();
     if (!gameOver && controller.fallDistance > 0) {
