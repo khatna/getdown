@@ -6,13 +6,13 @@ import {
 } from 'three';
 // import { Flower, Land } from 'objects';
 import { BasicLights } from 'lights';
-import { Cylinder } from '../objects/Cylinder';
+import { Cylinders } from '../objects/Cylinders';
 import { Platforms } from '../objects/Platforms';
 import { Ceiling } from '../objects/Ceiling';
 import { Particles } from '../objects/Particles';
 
 class SeedScene extends Scene {
-    constructor(controls) {
+    constructor(controls, renderer) {
         // Call parent Scene() constructor
         super();
 
@@ -34,16 +34,16 @@ class SeedScene extends Scene {
         const lights = new BasicLights();
         this.add(/*land, flower, */lights);
 
-        // Cylinder
-        const cylinder = new Cylinder(controls);
-        this.add(cylinder);
-        this.addToUpdateList(cylinder);
+        // Cylinders
+        const cylinders = new Cylinders(controls);
+        this.add(cylinders);
+        this.addToUpdateList(cylinders);
 
         // Ceiling
-        const ceiling = new Ceiling(controls);
+        const ceiling = new Ceiling(controls, renderer, this);
         this.add(ceiling);
         this.addToUpdateList(ceiling);
-        this.ceiling = ceiling.ceiling;
+        this.ceiling = ceiling;
 
         // Platforms
         const platforms = new Platforms(controls, ceiling.ceiling);

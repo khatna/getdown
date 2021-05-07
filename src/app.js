@@ -38,7 +38,7 @@ let startTimeStamp = null;
 const controls = new PointerLockControls(camera, canvas);
 
 // Set up scene
-const scene = new SeedScene(controls);
+const scene = new SeedScene(controls, renderer);
 
 // Gameplay controller
 const controller = new Controller(document, controls, scene);

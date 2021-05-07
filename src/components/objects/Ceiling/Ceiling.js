@@ -2,23 +2,70 @@ import {
     Group,
     CircleGeometry,
     MeshBasicMaterial,
-    DoubleSide,
-    Mesh
+    Mesh,
+    PMREMGenerator,
+    TextureLoader,
+    CylinderGeometry,
+    RepeatWrapping,
+    MeshStandardMaterial
 } from 'three';
 
+const CYLINDER_RADIUS = 150;
+
 class Ceiling extends Group {
-    constructor(controls) {
+    constructor(controls, renderer, scene) {
         super();
+
         this.controls = controls;
-        const geometry = new CircleGeometry(140, 32);
-        const material = new MeshBasicMaterial({color: 0xff0000, side: DoubleSide});
+        const geometry = new CircleGeometry(140, 128);
+        const texture = new TextureLoader().load('/src/components/assets/SheetMetal001_1K_Roughness.jpg');
+        texture.wrapS = RepeatWrapping;
+        texture.wrapT = RepeatWrapping;
+        texture.repeat.set(10, 10);
+        const material = new MeshBasicMaterial({
+            color: 0xFF595E,
+            map: texture
+        });
         this.ceiling = new Mesh(geometry, material);
         this.ceiling.rotateX(Math.PI / 2);
-        this.ceiling.position.y = 50; // Starting position
+        this.ceiling.position.y = 2.5;
+        this.position.y = 50; // Starting position
         this.add(this.ceiling);
         this.prevTimestamp = -1;
         this.distance = 0;
         this.speed = 0;
+        
+        new TextureLoader().load('/src/components/assets/Pipe002_1K_Color.jpg', (function(em) {
+
+            const pmremGenerator = new PMREMGenerator(renderer);
+            pmremGenerator.compileEquirectangularShader();
+            const envMap = pmremGenerator.fromEquirectangular(em).texture;
+            pmremGenerator.dispose();
+            // this.ceiling.material.envMap = envMap;
+            // this.ceiling.material.needsUpdate = true;
+
+            // Spike definition
+            const geometry = new CylinderGeometry(2, 0, 4.25, 16, 1, true);
+            const material = new MeshStandardMaterial({
+                color: 0xFF595E,
+                metalness: 1.0,
+                envMapIntensity: 1.0,
+                roughness: 0.0,
+                envMap: envMap
+            });
+            const spike = new Mesh(geometry, material);
+            
+            // Add spikes
+            for (let x = -CYLINDER_RADIUS; x < CYLINDER_RADIUS; x += 5) {
+                for (let z = -CYLINDER_RADIUS; z < CYLINDER_RADIUS; z += 5) {
+                    if (x**2 + z ** 2 > (CYLINDER_RADIUS - 10) ** 2) continue;
+                    let spikeClone = spike.clone();
+                    spikeClone.position.set(x, 0, z);
+                    this.add(spikeClone);
+                }
+            }
+
+        }).bind(this));
 
         // Parameters
         this.baseSpeed = 0.0001;
@@ -32,14 +79,14 @@ class Ceiling extends Group {
         }
 
         const delta = (timeStamp - this.prevTimestamp) / 5000;
-        this.distance = this.ceiling.position.y - this.controls.getObject().position.y;
+        this.distance = this.position.y - this.controls.getObject().position.y;
 
         this.speed =
             (this.baseSpeed +
             this.timeStampFactor * Math.sqrt(timeStamp) +
             this.distanceFactor * this.distance) * delta;
         
-        this.ceiling.position.y -= this.speed;
+        this.position.y -= this.speed;
     }
 }
 

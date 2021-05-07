@@ -167,7 +167,7 @@ class Controller {
         for (let i = 0; i < 5; i++) {
             let rc = rcs[i];
             let collision = [...this.scene.platforms.collision];
-            collision.push(this.scene.ceiling);
+            collision.push(this.scene.ceiling.ceiling);
             intersects = rc.intersectObjects(collision);
             if (intersects.length > 0) {
                 break;
