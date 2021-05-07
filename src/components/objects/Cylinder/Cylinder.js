@@ -1,12 +1,15 @@
 import {
     Group,
     CylinderGeometry,
+    MeshBasicMaterial,
     MeshStandardMaterial,
     Mesh,
     BackSide,
     TextureLoader,
-    RepeatWrapping
+    RepeatWrapping,
 } from 'three';
+
+const NUM_NEON_TUBES = 16;
 
 class Cylinder extends Group {
     constructor() {
@@ -21,7 +24,21 @@ class Cylinder extends Group {
             map: texture,
             color: 0x6A4C93
         });
-        return new Mesh(geometry, material);
+        this.add(new Mesh(geometry, material));
+
+        // Neon tubes
+        for (let i = 0; i < NUM_NEON_TUBES; i++) {
+            let geometry = new CylinderGeometry(1, 1, 1000, 16, 1, true);
+            const material = new MeshBasicMaterial({
+                color: 0x6A4C93
+            });
+            let neonTube = new Mesh(geometry, material);
+            let angle = 2 * Math.PI / NUM_NEON_TUBES * i;
+            neonTube.position.set(140 * Math.cos(angle), 0, 140 * Math.sin(angle));
+            this.add(neonTube);
+        }
+
+        return this;
     }
 }
 

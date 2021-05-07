@@ -40,7 +40,7 @@ class SeedScene extends Scene {
         this.addToUpdateList(cylinders);
 
         // Ceiling
-        const ceiling = new Ceiling(controls, renderer, this);
+        const ceiling = new Ceiling(controls, renderer);
         this.add(ceiling);
         this.addToUpdateList(ceiling);
         this.ceiling = ceiling;

@@ -116,7 +116,8 @@ const onAnimationFrameHandler = (timeStamp) => {
     renderer.render(scene, camera);
     if (!gameOver) {
         scene.update && scene.update(gameTimeStamp);
-        controller.update(gameTimeStamp);
+        if (scene.ceiling.loaded)
+            controller.update(gameTimeStamp);
     } else {
         animateDeath(camera);
     }
@@ -128,10 +129,12 @@ const onAnimationFrameHandler = (timeStamp) => {
     }
     controller.fallDistance = 0;
     hud.updateHealth(health);
-    hud.updateCeilingDistance(scene.ceiling.position.y - (controls.getObject().position.y + 2));
+    if (!gameOver) {
+        hud.updateCeilingDistance(scene.ceiling.position.y - (controls.getObject().position.y + 2));
+    }
     hud.setFallingCoverOpacity(Math.max(0, Math.min(
         1, (controller.landedHeight - controls.getObject().position.y - fallDamageThreshold) / 150)));
-    if (!pause || gameTimeStamp - startTimeStamp < 200) {
+    if (!pause || !scene.ceiling.loaded) {
         window.requestAnimationFrame(onAnimationFrameHandler);
     }
 };

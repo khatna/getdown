@@ -13,11 +13,11 @@ import {
 const CYLINDER_RADIUS = 150;
 
 class Ceiling extends Group {
-    constructor(controls, renderer, scene) {
+    constructor(controls, renderer) {
         super();
 
         this.controls = controls;
-        const geometry = new CircleGeometry(140, 128);
+        const geometry = new CircleGeometry(CYLINDER_RADIUS - 10, 128);
         const texture = new TextureLoader().load('/src/components/assets/SheetMetal001_1K_Roughness.jpg');
         texture.wrapS = RepeatWrapping;
         texture.wrapT = RepeatWrapping;
@@ -36,6 +36,8 @@ class Ceiling extends Group {
         this.speed = 0;
         
         new TextureLoader().load('/src/components/assets/Pipe002_1K_Color.jpg', (function(em) {
+
+            // Ref: https://stackoverflow.com/questions/65974012/three-js-how-to-add-envmap-correctly
 
             const pmremGenerator = new PMREMGenerator(renderer);
             pmremGenerator.compileEquirectangularShader();
@@ -58,12 +60,14 @@ class Ceiling extends Group {
             // Add spikes
             for (let x = -CYLINDER_RADIUS; x < CYLINDER_RADIUS; x += 5) {
                 for (let z = -CYLINDER_RADIUS; z < CYLINDER_RADIUS; z += 5) {
-                    if (x**2 + z ** 2 > (CYLINDER_RADIUS - 10) ** 2) continue;
+                    if (x**2 + z ** 2 > (CYLINDER_RADIUS - 15) ** 2) continue;
                     let spikeClone = spike.clone();
                     spikeClone.position.set(x, 0, z);
                     this.add(spikeClone);
                 }
             }
+
+            this.loaded = true;
 
         }).bind(this));
 
@@ -77,6 +81,8 @@ class Ceiling extends Group {
         if (this.prevTimestamp == -1) {
             this.prevTimestamp = timeStamp;
         }
+
+        if (!this.loaded) return;
 
         const delta = (timeStamp - this.prevTimestamp) / 5000;
         this.distance = this.position.y - this.controls.getObject().position.y;
