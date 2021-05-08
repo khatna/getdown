@@ -1,12 +1,16 @@
 import {
     Group,
-    BoxGeometry,
-    MeshPhongMaterial,
-    Mesh,
     Vector3,
     Raycaster,
+    BoxGeometry,
+    Mesh,
+    MeshPhongMaterial,
     DoubleSide
 } from 'three';
+import { Platform } from '../Platform';
+
+const PLATFORM_COLLISION_LENGTH = 7;
+const PLATFORM_THICKNESS = 0.5;
 
 class Platforms extends Group {
     constructor(controls, ceiling) {
@@ -14,9 +18,7 @@ class Platforms extends Group {
 
         // Properties of platforms
         this.playAreaLength = 120;
-        this.platformDisplayLength = 6;
-        this.platformCollisionLength = 7;
-        this.platformsPerIteration = 8;
+        this.platformsPerIteration = 7;
         this.minSpawnDistXZ = 10;
         this.maxSpawnDistXZ = 20;
         this.minSpawnDistDown = 10;
@@ -24,30 +26,26 @@ class Platforms extends Group {
         this.probSpawnBeyondHeightDamage = 0.2;
         this.heightDamageThreshold = 30;
         this.maxNumRetries = 5;
-        this.platformSpaceLength = 10;
-        this.platformSpaceHeight = 10;
+        this.platformSpaceLength = 20;
+        this.platformSpaceHeight = 20;
         this.initialSpawnBoxHeight = 60;
         this.spawnUntilY = -1000;
         this.spawnMoreTriggerY = -500;
         this.spawnIntervalY = 1000;
+        this.warpableProb = 0.2;
 
         this.controls = controls;
         this.ceiling = ceiling;
         this.initialized = false;
 
-        let platformMaterial = new MeshPhongMaterial({color: 0x333333, side: DoubleSide});
-
-        let platformDisplayGeometry = new BoxGeometry(
-            this.platformDisplayLength,
-            0.1,
-            this.platformDisplayLength
-        );
-        this.platformDisplayOriginal = new Mesh(platformDisplayGeometry, platformMaterial);
+        this.platformMainOriginal = new Platform();
         
+        let platformMaterial = new MeshPhongMaterial({side: DoubleSide});
+
         let platformCollisionGeometry = new BoxGeometry(
-            this.platformCollisionLength,
-            0.1,
-            this.platformCollisionLength
+            PLATFORM_COLLISION_LENGTH,
+            PLATFORM_THICKNESS,
+            PLATFORM_COLLISION_LENGTH
         );
         this.platformCollisionOriginal = new Mesh(platformCollisionGeometry, platformMaterial);
 
@@ -59,20 +57,20 @@ class Platforms extends Group {
         this.platformSpaceOriginal = new Mesh(platformSpaceGeometry, platformMaterial);
 
         this.p = {
-            display: [],
+            main: [],
             collision: [],
             space: []
         }
     }
 
-    addPlatform(platformDisplay, platformCollision, platformSpace) {
-        this.p.display.push(platformDisplay);
+    addPlatform(platformMain, platformCollision, platformSpace) {
+        this.p.main.push(platformMain);
         this.p.collision.push(platformCollision);
         this.p.space.push(platformSpace);
-        this.add(platformDisplay);
+        this.add(platformMain);
     }
 
-    spawnPlatform(x, z, minY, maxY, minSpawnDistXZ, maxSpawnDistXZ) {
+    spawnPlatform(x, z, minY, maxY, minSpawnDistXZ, maxSpawnDistXZ, warpable) {
         // Ref: https://stackoverflow.com/questions/33883843/threejs-raycasting-does-not-work#
         for (let i = 0; i < this.maxNumRetries; i++) {
             let spawnedPlatformPosition = new Vector3(
@@ -96,10 +94,10 @@ class Platforms extends Group {
             raycaster.set(spawnedPlatformPosition, new Vector3(0, -1, 0))
             const intersects = raycaster.intersectObjects(this.p.space);
             if (intersects.length % 2 == 0) {
-                let platformDisplay = this.platformDisplayOriginal.clone();
+                let platformMain = this.platformMainOriginal.clone();
                 let platformCollision = this.platformCollisionOriginal.clone();
                 let platformSpace = this.platformSpaceOriginal.clone();
-                platformDisplay.position.set(
+                platformMain.position.set(
                     spawnedPlatformPosition.x,
                     spawnedPlatformPosition.y,
                     spawnedPlatformPosition.z
@@ -116,7 +114,10 @@ class Platforms extends Group {
                 );
                 platformCollision.updateMatrixWorld();
                 platformSpace.updateMatrixWorld();
-                this.addPlatform(platformDisplay, platformCollision, platformSpace);
+                if (warpable) {
+                    platformMain.warpable = true;
+                }
+                this.addPlatform(platformMain, platformCollision, platformSpace);
                 return spawnedPlatformPosition;
             }
         }
@@ -134,18 +135,19 @@ class Platforms extends Group {
                         -this.playAreaLength / 2,
                         this.playAreaLength / 2,
                         0,
-                        this.playAreaLength / 2
+                        this.playAreaLength / 2,
+                        false
                     );
                 } else {
-                    this.spawnPlatform(0, 0, 0, 0, 0, 0);
+                    this.spawnPlatform(0, 0, 0, 0, 0, 0, false);
                 }
             }
         }
         // Remove platforms
-        for (let i = this.p.display.length - this.platformsPerIteration - 1; i >= 0; i--) {
-            if (this.p.display[i].position.y > this.ceiling.position.y) {
-                this.remove(this.p.display[i]);
-                this.p.display.splice(i, 1);
+        for (let i = this.p.main.length - this.platformsPerIteration - 1; i >= 0; i--) {
+            if (this.p.main[i].position.y > this.ceiling.position.y) {
+                this.remove(this.p.main[i]);
+                this.p.main.splice(i, 1);
                 this.p.collision.splice(i, 1);
                 this.p.space.splice(i, 1);
             }
@@ -154,29 +156,35 @@ class Platforms extends Group {
         if (!this.initialized || this.controls.getObject().position.y < this.spawnMoreTriggerY) {
             let stop = false;
             while (!stop) {
-                let startIndex = this.p.display.length - this.platformsPerIteration;
-                let endIndex = this.p.display.length;
+                let startIndex = this.p.main.length - this.platformsPerIteration;
+                let endIndex = this.p.main.length;
                 for (let i = startIndex; i < endIndex; i++) {
-                    let actualMaxSpawnDistDown = this.heightDamageThreshold;
-                    if (Math.random() < this.probSpawnBeyondHeightDamage) {
-                        actualMaxSpawnDistDown = this.maxSpawnDistDown;
+                    let actualMaxSpawnDistDown = this.maxSpawnDistDown;
+                    let warpable = false;
+                    if (Math.random() >= this.probSpawnBeyondHeightDamage) {
+                        actualMaxSpawnDistDown = this.heightDamageThreshold;
+                        if (Math.random() < this.warpableProb) {
+                            warpable = true;
+                        }
                     }
                     let spawnedPlatformPosition = this.spawnPlatform(
-                        this.p.display[i].position.x,
-                        this.p.display[i].position.z,
-                        this.p.display[i].position.y - actualMaxSpawnDistDown,
-                        this.p.display[i].position.y - this.minSpawnDistDown,
+                        this.p.main[i].position.x,
+                        this.p.main[i].position.z,
+                        this.p.main[i].position.y - actualMaxSpawnDistDown,
+                        this.p.main[i].position.y - this.minSpawnDistDown,
                         this.minSpawnDistXZ,
-                        this.maxSpawnDistXZ
+                        this.maxSpawnDistXZ,
+                        warpable
                     );
                     if (spawnedPlatformPosition === null) {
                         this.spawnPlatform(
                             0,
                             0,
-                            this.p.display[i].position.y - this.maxSpawnDistDown,
-                            this.p.display[i].position.y - this.minSpawnDistDown,
+                            this.p.main[i].position.y - this.maxSpawnDistDown,
+                            this.p.main[i].position.y - this.minSpawnDistDown,
                             0,
-                            this.playAreaLength / 2
+                            this.playAreaLength / 2,
+                            false
                         );
                     } else if (spawnedPlatformPosition.y <= this.spawnUntilY) {
                         stop = true;

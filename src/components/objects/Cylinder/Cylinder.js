@@ -38,7 +38,7 @@ class Cylinder extends Group {
             this.add(neonTube);
         }
 
-        return this;
+        // return this;
     }
 }
 
