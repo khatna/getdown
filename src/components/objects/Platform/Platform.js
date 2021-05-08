@@ -1,17 +1,19 @@
 import {
     Group,
     BoxGeometry,
-    MeshToonMaterial,
     Mesh,
     Vector3,
     ShaderMaterial,
     BackSide,
     FrontSide,
-    MeshStandardMaterial
+    MeshStandardMaterial,
+    Shape,
+    ExtrudeBufferGeometry,
+    DoubleSide
 } from 'three';
 
 const PLATFORM_MAIN_LENGTH = 6;
-const PLATFORM_THICKNESS = 0.5;
+const PLATFORM_THICKNESS = 1;
 
 // SHADERS ADAPTED FROM EXAMPLE: https://discourse.threejs.org/t/how-to-render-geometry-edges/5745
 
@@ -48,11 +50,39 @@ class Platform extends Group {
 
         this.warpable = false;
 
-        let platformMainGeometry = new BoxGeometry(
+        // Ref: https://discourse.threejs.org/t/round-edged-box/1402
+        let shape = new Shape();
+        let radius = 0.5;
+        let frameWidth = 1;
+        shape.absarc(0, 0, 0, -Math.PI / 2, -Math.PI, true);
+        shape.absarc(0, PLATFORM_MAIN_LENGTH -  radius * 2, 0, Math.PI, Math.PI / 2, true);
+        shape.absarc(PLATFORM_MAIN_LENGTH - radius * 2, PLATFORM_MAIN_LENGTH -  radius * 2, 0, Math.PI / 2, 0, true);
+        shape.absarc(PLATFORM_MAIN_LENGTH - radius * 2, 0, 0, 0, -Math.PI / 2, true);
+        let hole = new Shape();
+        hole.absarc(frameWidth, frameWidth, 0, -Math.PI / 2, -Math.PI, true);
+        hole.absarc(frameWidth, PLATFORM_MAIN_LENGTH - radius * 2 - frameWidth, 0, Math.PI, Math.PI / 2, true);
+        hole.absarc(PLATFORM_MAIN_LENGTH - radius * 2 - frameWidth, PLATFORM_MAIN_LENGTH -  radius * 2 - frameWidth, 0, Math.PI / 2, 0, true);
+        hole.absarc(PLATFORM_MAIN_LENGTH - radius * 2 - frameWidth, frameWidth, 0, 0, -Math.PI / 2, true);
+        shape.holes = [hole];
+        let platformMainGeometry = new ExtrudeBufferGeometry(shape, {
+            depth: PLATFORM_THICKNESS - radius * 2,
+            bevelEnabled: true,
+            bevelSegments: 4,
+            steps: 1,
+            bevelSize: radius,
+            bevelThickness: radius,
+            curveSegments: 0
+        });
+        platformMainGeometry.rotateX(Math.PI / 2);
+        
+        platformMainGeometry.center();
+
+        let platformCenterGeometry = new BoxGeometry(
             PLATFORM_MAIN_LENGTH,
-            PLATFORM_THICKNESS,
+            PLATFORM_THICKNESS - 0.25,
             PLATFORM_MAIN_LENGTH
         );
+
         // MATERIAL ADAPTED FROM EXAMPLE: 
         
         // let platformMaterial = new ShaderMaterial({
@@ -79,17 +109,20 @@ class Platform extends Group {
         //   });
         // this.add(new Mesh(platformMainGeometry, platformMaterial));
 
-        let platformMaterial = new MeshToonMaterial({color: 0x333333, side: FrontSide});
+        let platformMaterial = new MeshStandardMaterial({color: 0x8AC926, side: DoubleSide});
+        let platformCenterMaterial = new MeshStandardMaterial({color: 0xffffff, side: FrontSide});
         let outlineMaterial = new MeshStandardMaterial({color:0x000000, side: BackSide});
 
         let group = new Group;
         
         let platform = new Mesh(platformMainGeometry, platformMaterial)
-        platform.scale.multiplyScalar( 0.95 );
+        platform.scale.multiplyScalar(0.95);
         group.add(platform);
+        let center = new Mesh(platformCenterGeometry, platformCenterMaterial);
+        group.add(center);
         let outline = new Mesh(platformMainGeometry, outlineMaterial);
         group.add(outline);
-        this.add(group)
+        this.add(group);
 
     }
 }

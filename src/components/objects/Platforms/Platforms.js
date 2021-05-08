@@ -9,8 +9,8 @@ import {
 } from 'three';
 import { Platform } from '../Platform';
 
-const PLATFORM_COLLISION_LENGTH = 7;
-const PLATFORM_THICKNESS = 0.5;
+const PLATFORM_COLLISION_LENGTH = 8;
+const PLATFORM_THICKNESS = 1;
 
 class Platforms extends Group {
     constructor(controls, ceiling) {
@@ -29,9 +29,9 @@ class Platforms extends Group {
         this.platformSpaceLength = 20;
         this.platformSpaceHeight = 20;
         this.initialSpawnBoxHeight = 60;
-        this.spawnUntilY = -1000;
-        this.spawnMoreTriggerY = -500;
-        this.spawnIntervalY = 1000;
+        this.spawnUntilY = -500;
+        this.spawnMoreTriggerY = -250;
+        this.spawnIntervalY = 500;
         this.warpableProb = 0.2;
 
         this.controls = controls;

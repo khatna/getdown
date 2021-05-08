@@ -12,7 +12,7 @@ import { Ceiling } from '../objects/Ceiling';
 import { Particles } from '../objects/Particles';
 
 class SeedScene extends Scene {
-    constructor(controls, renderer) {
+    constructor(controls, renderer, camera) {
         // Call parent Scene() constructor
         super();
 
@@ -28,11 +28,9 @@ class SeedScene extends Scene {
         this.background =  background_and_fog_color;
         this.fog = new Fog(background_and_fog_color, 100, 250);
 
-        // Add meshes to scene
-        // const land = new Land();
-        // const flower = new Flower(this);
+        // Lights
         const lights = new BasicLights();
-        this.add(/*land, flower, */lights);
+        this.add(lights);
 
         // Cylinders
         const cylinders = new Cylinders(controls);

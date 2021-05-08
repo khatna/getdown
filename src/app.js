@@ -6,7 +6,7 @@
  * handles window resizes.
  *
  */
-import { WebGLRenderer, PerspectiveCamera, Vector3 } from 'three';
+import { WebGLRenderer, PerspectiveCamera, SpotLight } from 'three';
 import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls.js';
 import { SeedScene } from 'scenes';
 import { Controller } from './controller';
@@ -20,6 +20,9 @@ const renderer = new WebGLRenderer({ antialias: true });
 // Set up camera
 camera.position.set(0, 3, 0);
 // camera.lookAt(new Vector3(0, 0, 0));
+// const spotlight = new SpotLight(0xffffff, 1.6, 7, 0.8, 1, 1);
+// spotlight.position.set(0, 0, 10);
+// camera.add(spotlight);
 
 // Set up renderer, canvas, and minor CSS adjustments
 renderer.setPixelRatio(window.devicePixelRatio);
