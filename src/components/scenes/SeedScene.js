@@ -24,7 +24,7 @@ class SeedScene extends Scene {
         };
 
         // Background and fog
-        let background_and_fog_color = new Color(0x000000);
+        let background_and_fog_color = new Color(0x062030);
         this.background =  background_and_fog_color;
         this.fog = new Fog(background_and_fog_color, 100, 250);
 

@@ -22,7 +22,7 @@ class Cylinder extends Group {
         const material = new MeshStandardMaterial({
             side: BackSide,
             map: texture,
-            color: 0x6A4C93
+            color: 0x1982C4
         });
         this.add(new Mesh(geometry, material));
 
@@ -30,7 +30,7 @@ class Cylinder extends Group {
         for (let i = 0; i < NUM_NEON_TUBES; i++) {
             let geometry = new CylinderGeometry(1, 1, 1000, 16, 1, true);
             const material = new MeshBasicMaterial({
-                color: 0x6A4C93
+                color: 0x1982C4
             });
             let neonTube = new Mesh(geometry, material);
             let angle = 2 * Math.PI / NUM_NEON_TUBES * i;

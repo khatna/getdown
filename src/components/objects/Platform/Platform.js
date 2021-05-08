@@ -7,7 +7,7 @@ import {
     ShaderMaterial,
     BackSide,
     FrontSide,
-    MeshPhongMaterial
+    MeshStandardMaterial
 } from 'three';
 
 const PLATFORM_MAIN_LENGTH = 6;
@@ -54,39 +54,38 @@ class Platform extends Group {
             PLATFORM_MAIN_LENGTH
         );
         // MATERIAL ADAPTED FROM EXAMPLE: 
-        /*
-        let platformMaterial = new ShaderMaterial({
-            uniforms: {
-                size: {
-                    value: new Vector3(
-                        platformMainGeometry.parameters.width, 
-                        platformMainGeometry.parameters.height, 
-                        platformMainGeometry.parameters.depth
-                    ).multiplyScalar(0.5)
-                },
-                thickness: {
-                    value: 0.05
-                },
-                smoothness: {
-                    value: 0
-                },
-                color: {
-                    value: new Vector3(0.2, 0.2, 0.2)
-                }
-            },
-            vertexShader: vertexShader,
-            fragmentShader: fragmentShader
-          });
-        this.add(new Mesh(platformMainGeometry, platformMaterial));*/
+        
+        // let platformMaterial = new ShaderMaterial({
+        //     uniforms: {
+        //         size: {
+        //             value: new Vector3(
+        //                 platformMainGeometry.parameters.width, 
+        //                 platformMainGeometry.parameters.height, 
+        //                 platformMainGeometry.parameters.depth
+        //             ).multiplyScalar(0.5)
+        //         },
+        //         thickness: {
+        //             value: 0.05
+        //         },
+        //         smoothness: {
+        //             value: 0.1
+        //         },
+        //         color: {
+        //             value: new Vector3(0.8, 0.8, 0.8)
+        //         }
+        //     },
+        //     vertexShader: vertexShader,
+        //     fragmentShader: fragmentShader
+        //   });
+        // this.add(new Mesh(platformMainGeometry, platformMaterial));
 
-        let platformMaterial = new MeshToonMaterial({color: 0x000000, side: BackSide});
-        let outlineMaterial = new MeshPhongMaterial({color:0x333333, side: FrontSide});
+        let platformMaterial = new MeshToonMaterial({color: 0x333333, side: FrontSide});
+        let outlineMaterial = new MeshStandardMaterial({color:0x000000, side: BackSide});
 
         let group = new Group;
         
         let platform = new Mesh(platformMainGeometry, platformMaterial)
-        const s = 1.03
-        platform.scale.set(s,s,s)
+        platform.scale.multiplyScalar( 0.95 );
         group.add(platform);
         let outline = new Mesh(platformMainGeometry, outlineMaterial);
         group.add(outline);

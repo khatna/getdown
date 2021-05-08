@@ -14,7 +14,7 @@ import { Hud } from './hud';
 import { animateDeath } from './controller/deathAnimation';
 
 // Initialize core ThreeJS components
-const camera = new PerspectiveCamera(60, 1, 0.001);
+const camera = new PerspectiveCamera(60, 1);
 const renderer = new WebGLRenderer({ antialias: true });
 
 // Set up camera
