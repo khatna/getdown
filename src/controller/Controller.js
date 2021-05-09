@@ -28,6 +28,7 @@ class Controller {
         this.warpRaycaster = null;
         this.scene = scene;
         this.fallDistance = 0;
+        this.warping = false;
         this.landedHeight = null;
 
         // Keyboard controls
@@ -143,7 +144,7 @@ class Controller {
         this.warpRaycaster = new Raycaster(
             this.controls.getObject().position,
             new Vector3(),
-            0, 100
+            0, 50
         );
     }
 
@@ -195,6 +196,7 @@ class Controller {
 
     warp() {
         if (this.controls.isLocked) {
+            this.warping = true;
             let rc = this.warpRaycaster;
             let objs = this.scene.platforms.collision;
             let intersects = rc.intersectObjects(objs);
@@ -209,7 +211,11 @@ class Controller {
                     }, 100)
                     .easing(TWEEN.Easing.Quadratic.Out);
                     warpTween.start();
-                    warpTween.onComplete(() => this.landed = true);
+                    warpTween.onComplete(() => {
+                        this.landedHeight = p.position.y + 3.5;
+                        this.landed = true;
+                        this.warping = false;
+                    });
                 }
             }
         }
@@ -271,6 +277,11 @@ class Controller {
             intersects = this.getIntersections(true);
             if (intersects.length > 0 && this.velocity.y > 0) {
                 this.velocity.y *= -1; // perfect bounce
+            }
+
+            // no fall damage if successfully warped
+            if (this.warping) {
+                this.fallDistance = 0;
             }
 
             // movement
