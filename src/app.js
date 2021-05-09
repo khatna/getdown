@@ -125,7 +125,7 @@ const onAnimationFrameHandler = (timeStamp) => {
         animateDeath(camera);
     }
 
-    hud.setDebugMsg(controller.velocity.z);
+    hud.setDebugMsg(controls.getObject().position.y);
     calculateHealth();
     if (!gameOver && controller.fallDistance > 0) {
         hud.addFallDistanceToScore(controller.fallDistance);

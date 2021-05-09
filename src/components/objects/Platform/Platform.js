@@ -44,6 +44,15 @@ void main() {
 }
 `
 
+const drawRoundedSquare = (a, b) => {
+    let shape = new Shape();
+    shape.absarc(a, a, 0, -Math.PI / 2, -Math.PI, true);
+    shape.absarc(a, b, 0, Math.PI, Math.PI / 2, true);
+    shape.absarc(b, b, 0, Math.PI / 2, 0, true);
+    shape.absarc(b, a, 0, 0, -Math.PI / 2, true);
+    return shape;
+}
+
 class Platform extends Group {
     constructor() {
         super();
@@ -51,18 +60,10 @@ class Platform extends Group {
         this.warpable = false;
 
         // Ref: https://discourse.threejs.org/t/round-edged-box/1402
-        let shape = new Shape();
         let radius = 0.5;
         let frameWidth = 1;
-        shape.absarc(0, 0, 0, -Math.PI / 2, -Math.PI, true);
-        shape.absarc(0, PLATFORM_MAIN_LENGTH -  radius * 2, 0, Math.PI, Math.PI / 2, true);
-        shape.absarc(PLATFORM_MAIN_LENGTH - radius * 2, PLATFORM_MAIN_LENGTH -  radius * 2, 0, Math.PI / 2, 0, true);
-        shape.absarc(PLATFORM_MAIN_LENGTH - radius * 2, 0, 0, 0, -Math.PI / 2, true);
-        let hole = new Shape();
-        hole.absarc(frameWidth, frameWidth, 0, -Math.PI / 2, -Math.PI, true);
-        hole.absarc(frameWidth, PLATFORM_MAIN_LENGTH - radius * 2 - frameWidth, 0, Math.PI, Math.PI / 2, true);
-        hole.absarc(PLATFORM_MAIN_LENGTH - radius * 2 - frameWidth, PLATFORM_MAIN_LENGTH -  radius * 2 - frameWidth, 0, Math.PI / 2, 0, true);
-        hole.absarc(PLATFORM_MAIN_LENGTH - radius * 2 - frameWidth, frameWidth, 0, 0, -Math.PI / 2, true);
+        let shape = drawRoundedSquare(0, PLATFORM_MAIN_LENGTH -  radius * 2);
+        let hole = drawRoundedSquare(frameWidth, PLATFORM_MAIN_LENGTH - radius * 2 - frameWidth);
         shape.holes = [hole];
         let platformMainGeometry = new ExtrudeBufferGeometry(shape, {
             depth: PLATFORM_THICKNESS - radius * 2,

@@ -30,8 +30,8 @@ class Platforms extends Group {
         this.platformSpaceHeight = 20;
         this.initialSpawnBoxHeight = 60;
         this.spawnUntilY = -500;
-        this.spawnMoreTriggerY = -250;
-        this.spawnIntervalY = 500;
+        this.spawnMoreTriggerY = -100;
+        this.spawnIntervalY = 50;
         this.warpableProb = 0.2;
 
         this.controls = controls;
