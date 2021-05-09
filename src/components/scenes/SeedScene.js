@@ -44,7 +44,7 @@ class SeedScene extends Scene {
         this.ceiling = ceiling;
 
         // Platforms
-        const platforms = new Platforms(controls, ceiling.ceiling);
+        const platforms = new Platforms(controls, ceiling);
         this.add(platforms);
         this.addToUpdateList(platforms);
         this.platforms = platforms.p;

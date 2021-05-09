@@ -78,6 +78,9 @@ class Platforms extends Group {
                 minY + Math.random() * (maxY - minY),
                 z - maxSpawnDistXZ + Math.random() * maxSpawnDistXZ * 2
             );
+            if (spawnedPlatformPosition.y > this.ceiling.position.y - 3) {
+                continue;
+            }
             if (spawnedPlatformPosition.x > x - minSpawnDistXZ &&
                 spawnedPlatformPosition.x < x + minSpawnDistXZ &&
                 spawnedPlatformPosition.z > z - minSpawnDistXZ &&
@@ -148,7 +151,10 @@ class Platforms extends Group {
         }
         // Remove platforms
         for (let i = this.p.main.length - this.platformsPerIteration - 1; i >= 0; i--) {
-            if (this.p.main[i].position.y > this.ceiling.position.y) {
+            if (this.p.main[i].position.y > this.ceiling.position.y - 3) {
+                this.p.main[i].collapse(timeStamp);
+            }
+            if (this.p.main[i].position.y > this.ceiling.position.y + 10) {
                 this.remove(this.p.main[i]);
                 this.p.main.splice(i, 1);
                 this.p.collision.splice(i, 1);
