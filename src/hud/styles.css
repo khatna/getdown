@@ -87,3 +87,17 @@ body {
 #damage {
     background-color: red;
 }
+
+#crosshair {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -12.5px;
+    margin-left: -12.5px;
+    z-index: 100;
+}
+
+#crosshair img {
+    width: 25px;
+    height: 25px;
+}

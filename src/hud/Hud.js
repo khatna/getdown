@@ -56,6 +56,11 @@ class Hud {
         ));
         $("#damage").hide();
 
+        // Crosshair
+        $('body').append($(
+            '<div id="crosshair"><img src="/src/components/assets/crosshair.png" alt="crosshair"></div>'
+        ));
+
     }
 
     resumeGame() {
