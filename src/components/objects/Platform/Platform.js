@@ -183,7 +183,7 @@ class Platform extends Group {
     }
 
     updateColorWarpable() {
-        this.children[0].children[1].material.color.setHex(0x8AC926);
+        this.children[0].children[0].material.color.setHex(0x8AC926);
     }
 }
 
