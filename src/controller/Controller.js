@@ -279,11 +279,6 @@ class Controller {
                 this.velocity.y *= -1; // perfect bounce
             }
 
-            // no fall damage if successfully warped
-            if (this.warping) {
-                this.fallDistance = 0;
-            }
-
             // movement
             this.controls.moveRight(-this.velocity.x * delta);
             this.controls.moveForward(-this.velocity.z * delta);
