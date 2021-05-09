@@ -114,9 +114,12 @@ class Platforms extends Group {
                 );
                 platformCollision.updateMatrixWorld();
                 platformSpace.updateMatrixWorld();
+                platformCollision.warpable = warpable;
+
                 if (warpable) {
-                    platformMain.warpable = true;
+                    platformMain.updateColorWarpable();
                 }
+
                 this.addPlatform(platformMain, platformCollision, platformSpace);
                 return spawnedPlatformPosition;
             }
@@ -163,10 +166,12 @@ class Platforms extends Group {
                     let warpable = false;
                     if (Math.random() >= this.probSpawnBeyondHeightDamage) {
                         actualMaxSpawnDistDown = this.heightDamageThreshold;
-                        if (Math.random() < this.warpableProb) {
-                            warpable = true;
-                        }
                     }
+
+                    if (Math.random() < this.warpableProb) {
+                        warpable = true;
+                    }
+
                     let spawnedPlatformPosition = this.spawnPlatform(
                         this.p.main[i].position.x,
                         this.p.main[i].position.z,

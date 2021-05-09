@@ -57,8 +57,6 @@ class Platform extends Group {
     constructor() {
         super();
 
-        this.warpable = false;
-
         // Ref: https://discourse.threejs.org/t/round-edged-box/1402
         let radius = 0.5;
         let frameWidth = 1;
@@ -125,6 +123,10 @@ class Platform extends Group {
         group.add(outline);
         this.add(group);
 
+    }
+
+    updateColorWarpable() {
+        this.children[0].children[1].material.color.setHex(0x8AC926);
     }
 }
 

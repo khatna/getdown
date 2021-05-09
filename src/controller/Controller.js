@@ -1,7 +1,8 @@
 // Controls and basic physics. Code adapted from
 // https://github.com/mrdoob/three.js/blob/master/examples/misc_controls_pointerlock.html
 
-import { Vector3, Raycaster, Box3 } from 'three';
+import { Vector3, Raycaster } from 'three';
+import { TWEEN } from 'three/examples/jsm/libs/tween.module.min.js';
 
 // size of player's body
 const BODY_SIZE = 2;
@@ -24,6 +25,7 @@ class Controller {
         this.prevTimestamp = -1;
         this.bottomRaycasters = [];
         this.topRaycasters = [];
+        this.warpRaycaster = null;
         this.scene = scene;
         this.fallDistance = 0;
         this.landedHeight = null;
@@ -95,6 +97,7 @@ class Controller {
 
         this.document.addEventListener('keydown', onKeyDown);
         this.document.addEventListener('keyup', onKeyUp);
+        this.document.addEventListener('mousedown', this.warp.bind(this));
 
         // Initialize raycasters
         this.initializeRaycasters();
@@ -135,10 +138,18 @@ class Controller {
                 )
             );
         }
+
+        // forward raycaster (for warping)
+        this.warpRaycaster = new Raycaster(
+            this.controls.getObject().position,
+            new Vector3(),
+            0, 100
+        );
     }
 
-    // update the origin of each corner raycaster properly
+    // update the origin of each raycaster properly
     updateRaycasters() {
+        // collision raycasters
         for (let i = 0; i < 2; i++) {
             for (let j = 0; j < 2; j++) {
                 let dx = (2 * i - 1) * BODY_SIZE / 2;
@@ -153,6 +164,12 @@ class Controller {
                 trc.ray.origin.z += dz;
             }
         }
+
+        // warp raycaster
+        let quaternion = this.controls.getObject().quaternion;
+        let lookAtVector = new Vector3(0, 0, -1);
+        lookAtVector.applyQuaternion(quaternion);
+        this.warpRaycaster.ray.direction = lookAtVector;
     }
 
     // check whether there is a collision (-y direction)
@@ -174,6 +191,28 @@ class Controller {
             }
         }
         return intersects;
+    }
+
+    warp() {
+        if (this.controls.isLocked) {
+            let rc = this.warpRaycaster;
+            let objs = this.scene.platforms.collision;
+            let intersects = rc.intersectObjects(objs);
+            if (intersects.length > 0) {
+                let p = intersects[0].object;
+                if (p.warpable) {
+                    let warpTween = new TWEEN.Tween(this.controls.getObject().position)
+                    .to({
+                        x: p.position.x,
+                        y: p.position.y + 3.5,
+                        z: p.position.z
+                    }, 100)
+                    .easing(TWEEN.Easing.Quadratic.Out);
+                    warpTween.start();
+                    warpTween.onComplete(() => this.landed = true);
+                }
+            }
+        }
     }
 
     jump() {
@@ -247,6 +286,10 @@ class Controller {
             // }
 
             this.prevTimestamp = timeStamp;
+
+            // update tweens
+            TWEEN.update();
+
             return;
         }
     }

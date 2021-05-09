@@ -53,13 +53,7 @@ const hud = new Hud();
 document.body.addEventListener('mousedown', function () {
     if (pause) {
         controls.lock();
-    } else {
-        controller.jump();
     }
-});
-
-document.body.addEventListener('mouseup', function () {
-    controller.jumping = false;
 });
 
 document.body.addEventListener('dblclick', function () {
