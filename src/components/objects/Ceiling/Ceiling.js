@@ -7,7 +7,8 @@ import {
     TextureLoader,
     CylinderGeometry,
     RepeatWrapping,
-    MeshStandardMaterial
+    MeshStandardMaterial,
+    BackSide
 } from 'three';
 
 const CYLINDER_RADIUS = 150;
@@ -55,7 +56,11 @@ class Ceiling extends Group {
                 roughness: 0.0,
                 envMap: envMap
             });
+            const outlineMaterial = new MeshStandardMaterial({color:0x000000, side: BackSide});
+
             const spike = new Mesh(geometry, material);
+            const spikeOutline = new Mesh(geometry, outlineMaterial);
+            spikeOutline.scale.multiplyScalar(1.3)
             
             // Add spikes
             for (let x = -CYLINDER_RADIUS; x < CYLINDER_RADIUS; x += 5) {
@@ -64,6 +69,9 @@ class Ceiling extends Group {
                     let spikeClone = spike.clone();
                     spikeClone.position.set(x, 0, z);
                     this.add(spikeClone);
+                    let spikeOutlineClone = spikeOutline.clone();
+                    spikeOutlineClone.position.set(x, 0, z);
+                    this.add(spikeOutlineClone);
                 }
             }
 

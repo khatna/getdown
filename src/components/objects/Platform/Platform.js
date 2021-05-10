@@ -2,8 +2,6 @@ import {
     Group,
     BoxGeometry,
     Mesh,
-    Vector3,
-    ShaderMaterial,
     BackSide,
     FrontSide,
     MeshStandardMaterial,
