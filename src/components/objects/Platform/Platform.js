@@ -13,35 +13,6 @@ import {
 const PLATFORM_MAIN_LENGTH = 6;
 const PLATFORM_THICKNESS = 1;
 
-// SHADERS ADAPTED FROM EXAMPLE: https://discourse.threejs.org/t/how-to-render-geometry-edges/5745
-
-const vertexShader = `
-varying vec3 vPos;
-void main()	{
-  vPos = position;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
-}
-`
-
-const fragmentShader = `
-varying vec3 vPos;
-uniform vec3 size;
-uniform float thickness;
-uniform float smoothness;
-uniform vec3 color;
-
-void main() {
-        
-    float a = smoothstep(thickness, thickness + smoothness, length(abs(vPos.xy) - size.xy));
-    a *= smoothstep(thickness, thickness + smoothness, length(abs(vPos.yz) - size.yz));
-    a *= smoothstep(thickness, thickness + smoothness, length(abs(vPos.xz) - size.xz));
-    
-    vec3 c = mix(vec3(0), color, a);
-    
-    gl_FragColor = vec4(c, 1.0);
-}
-`
-
 const drawRoundedSquare = (a, b) => {
     let shape = new Shape();
     shape.absarc(a, a, 0, -Math.PI / 2, -Math.PI, true);
@@ -79,32 +50,6 @@ class Platform extends Group {
             PLATFORM_THICKNESS - 0.25,
             PLATFORM_MAIN_LENGTH
         );
-
-        // MATERIAL ADAPTED FROM EXAMPLE: 
-        
-        // let platformMaterial = new ShaderMaterial({
-        //     uniforms: {
-        //         size: {
-        //             value: new Vector3(
-        //                 platformMainGeometry.parameters.width, 
-        //                 platformMainGeometry.parameters.height, 
-        //                 platformMainGeometry.parameters.depth
-        //             ).multiplyScalar(0.5)
-        //         },
-        //         thickness: {
-        //             value: 0.05
-        //         },
-        //         smoothness: {
-        //             value: 0.1
-        //         },
-        //         color: {
-        //             value: new Vector3(0.8, 0.8, 0.8)
-        //         }
-        //     },
-        //     vertexShader: vertexShader,
-        //     fragmentShader: fragmentShader
-        //   });
-        // this.add(new Mesh(platformMainGeometry, platformMaterial));
 
         this.platformMaterial = new MeshStandardMaterial({color: 0xFFCA3A, side: DoubleSide});
         this.platformCenterMaterial = new MeshStandardMaterial({color: 0xffffff, side: FrontSide});
