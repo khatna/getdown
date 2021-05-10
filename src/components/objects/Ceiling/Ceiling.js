@@ -84,7 +84,7 @@ class Ceiling extends Group {
 
         if (!this.loaded) return;
 
-        const delta = (timeStamp - this.prevTimestamp) / 5000;
+        const delta = (timeStamp - this.prevTimestamp) / 10;
         this.distance = this.position.y - this.controls.getObject().position.y;
 
         this.speed =
@@ -93,6 +93,7 @@ class Ceiling extends Group {
             this.distanceFactor * this.distance) * delta;
         
         this.position.y -= this.speed;
+        this.prevTimestamp = timeStamp;
     }
 }
 

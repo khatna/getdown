@@ -98,7 +98,7 @@ class Controller {
 
         this.document.addEventListener('keydown', onKeyDown);
         this.document.addEventListener('keyup', onKeyUp);
-        this.document.addEventListener('mousedown', this.warp.bind(this));
+        // this.document.addEventListener('mousedown', this.warp.bind(this));
 
         // Initialize raycasters
         this.initializeRaycasters();
@@ -216,9 +216,11 @@ class Controller {
                         this.landed = true;
                         this.warping = false;
                     });
+                    return true;
                 }
             }
         }
+        return false;
     }
 
     jump() {
