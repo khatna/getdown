@@ -41,9 +41,9 @@ class Hud {
         ));
 
         // Debug
-        $('body').append($(
-            '<div id="debug" class="hud-message">Debug</div>'
-        ));
+        // $('body').append($(
+        //     '<div id="debug" class="hud-message">Debug</div>'
+        // ));
 
         // Falling cover
         $('body').append($(

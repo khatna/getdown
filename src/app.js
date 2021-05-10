@@ -69,7 +69,6 @@ document.body.addEventListener('dblclick', function () {
 });
 
 controls.addEventListener('lock', function () {
-    scene.state.gui.hide();
     hud.resumeGame();
     pause = false;
     prevTimeStamp = null;
@@ -77,7 +76,6 @@ controls.addEventListener('lock', function () {
 });
 
 controls.addEventListener('unlock', function () {
-    scene.state.gui.show();
     hud.pauseGame();
     pause = true;
 });
@@ -125,7 +123,7 @@ const onAnimationFrameHandler = (timeStamp) => {
         animateDeath(camera);
     }
 
-    hud.setDebugMsg(controls.getObject().position.y);
+    // hud.setDebugMsg(controls.getObject().position.y);
     calculateHealth();
     if (!gameOver && controller.fallDistance > 0) {
         hud.addFallDistanceToScore(controller.fallDistance);
