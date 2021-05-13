@@ -7,7 +7,8 @@ import {
     MeshStandardMaterial,
     Shape,
     ExtrudeBufferGeometry,
-    DoubleSide
+    DoubleSide,
+    TextureLoader
 } from 'three';
 
 const PLATFORM_MAIN_LENGTH = 6;
@@ -125,8 +126,15 @@ class Platform extends Group {
         }
     }
 
-    updateColorWarpable() {
+    updateWarpablePlatform() {
         this.children[0].children[0].material.color.setHex(0xFF595E);
+    }
+
+    updateHealthPlatform() {
+        this.children[0].children[0].material.color.setHex(0x8AC926);
+        let img = new TextureLoader().load('/src/components/assets/plus.png');
+        this.children[0].children[1].material = new MeshStandardMaterial({color: 0xffffff, side: FrontSide, map: img});
+
     }
 }
 

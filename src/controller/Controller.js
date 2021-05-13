@@ -237,6 +237,7 @@ class Controller {
             this.prevTimestamp = timeStamp;
         }
 
+        // check if crosshair is on warpable platform, color accordingly
         let rc = this.warpRaycaster;
         let objs = this.scene.platforms.collision;
         let intersects = rc.intersectObjects(objs);

@@ -33,6 +33,7 @@ class Platforms extends Group {
         this.spawnMoreTriggerY = -100;
         this.spawnIntervalY = 50;
         this.warpableProb = 0.2;
+        this.healthProb = 0.05;
 
         this.controls = controls;
         this.ceiling = ceiling;
@@ -70,7 +71,7 @@ class Platforms extends Group {
         this.add(platformMain);
     }
 
-    spawnPlatform(x, z, minY, maxY, minSpawnDistXZ, maxSpawnDistXZ, warpable) {
+    spawnPlatform(x, z, minY, maxY, minSpawnDistXZ, maxSpawnDistXZ, warpable, health) {
         // Ref: https://stackoverflow.com/questions/33883843/threejs-raycasting-does-not-work#
         for (let i = 0; i < this.maxNumRetries; i++) {
             let spawnedPlatformPosition = new Vector3(
@@ -120,7 +121,10 @@ class Platforms extends Group {
                 platformCollision.warpable = warpable;
 
                 if (warpable) {
-                    platformMain.updateColorWarpable();
+                    platformMain.updateWarpablePlatform();
+                }
+                if (health) {
+                    platformMain.updateHealthPlatform();
                 }
 
                 this.addPlatform(platformMain, platformCollision, platformSpace);
@@ -142,10 +146,12 @@ class Platforms extends Group {
                         this.playAreaLength / 2,
                         0,
                         this.playAreaLength / 2,
+                        false,
                         false
                     );
                 } else {
-                    this.spawnPlatform(0, 0, 0, 0, 0, 0, false);
+
+                    this.spawnPlatform(0, 0, 0, 0, 0, 0, false, false);
                 }
             }
         }
@@ -170,12 +176,17 @@ class Platforms extends Group {
                 for (let i = startIndex; i < endIndex; i++) {
                     let actualMaxSpawnDistDown = this.maxSpawnDistDown;
                     let warpable = false;
+                    let health = false;
                     if (Math.random() >= this.probSpawnBeyondHeightDamage) {
                         actualMaxSpawnDistDown = this.heightDamageThreshold;
                     }
 
+                    // platforms are either warpable or health platforms, not both
                     if (Math.random() < this.warpableProb) {
                         warpable = true;
+                    } 
+                    else if (Math.random() < this.healthProb) {
+                        health = true;
                     }
 
                     let spawnedPlatformPosition = this.spawnPlatform(
@@ -185,7 +196,8 @@ class Platforms extends Group {
                         this.p.main[i].position.y - this.minSpawnDistDown,
                         this.minSpawnDistXZ,
                         this.maxSpawnDistXZ,
-                        warpable
+                        warpable,
+                        health
                     );
                     if (spawnedPlatformPosition === null) {
                         this.spawnPlatform(
@@ -195,6 +207,7 @@ class Platforms extends Group {
                             this.p.main[i].position.y - this.minSpawnDistDown,
                             0,
                             this.playAreaLength / 2,
+                            false,
                             false
                         );
                     } else if (spawnedPlatformPosition.y <= this.spawnUntilY) {
