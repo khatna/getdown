@@ -62,6 +62,9 @@ class Platforms extends Group {
             collision: [],
             space: []
         }
+
+        this.warpablePlatforms = [];
+        this.warpableCollisions = [];
     }
 
     addPlatform(platformMain, platformCollision, platformSpace) {
@@ -69,6 +72,11 @@ class Platforms extends Group {
         this.p.collision.push(platformCollision);
         this.p.space.push(platformSpace);
         this.add(platformMain);
+
+        if (platformCollision.warpable) {
+            this.warpablePlatforms.push(platformMain);
+            this.warpableCollisions.push(platformCollision);
+        }
     }
 
     spawnPlatform(x, z, minY, maxY, minSpawnDistXZ, maxSpawnDistXZ, warpable, health) {
@@ -123,9 +131,6 @@ class Platforms extends Group {
                 platformCollision.warpable = warpable;
                 platformCollision.health = health;
 
-                if (warpable) {
-                    platformMain.updateWarpablePlatform();
-                }
                 if (health) {
                     platformMain.updateHealthPlatform();
                 }
@@ -135,6 +140,16 @@ class Platforms extends Group {
             }
         }
         return null;
+    }
+
+    updateWarpablePlatforms(position, dist) {
+        let platforms = this.warpablePlatforms;
+        let collisions = this.warpableCollisions;
+        for (let i = 0; i < platforms.length; i++) {
+            if (collisions[i].warpable && Math.abs(position.y - collisions[i].position.y) < dist) {
+                platforms[i].updateWarpablePlatform();
+            }
+        }
     }
 
     update(timeStamp) {
@@ -164,6 +179,12 @@ class Platforms extends Group {
                 this.p.main[i].collapse(timeStamp);
             }
             if (this.p.main[i].position.y > this.ceiling.position.y + 10) {
+                if (this.warpablePlatforms.includes(this.p.main[i])) {
+                    let idx = this.warpablePlatforms.indexOf(this.p.main[i]);
+                    this.warpablePlatforms.splice(idx, 1);
+                    this.warpableCollisions.splice(idx, 1);
+                }
+
                 this.remove(this.p.main[i]);
                 this.p.main.splice(i, 1);
                 this.p.collision.splice(i, 1);

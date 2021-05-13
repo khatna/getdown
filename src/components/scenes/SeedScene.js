@@ -47,6 +47,7 @@ class SeedScene extends Scene {
         this.add(platforms);
         this.addToUpdateList(platforms);
         this.platforms = platforms.p;
+        this.platformsObj = platforms;
 
         // Particles
         const particles = new Particles(controls);

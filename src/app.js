@@ -107,11 +107,6 @@ const calculateHealth = () => {
     }
 }
 
-// determine which platforms are currently warpable
-const colorWarpablePlatforms = () => {
-    
-}
-
 // Render loop
 const onAnimationFrameHandler = (timeStamp) => {
     if (startTimeStamp === null)
@@ -128,8 +123,7 @@ const onAnimationFrameHandler = (timeStamp) => {
         animateDeath(camera);
     }
 
-    // hud.setDebugMsg(controls.getObject().position.y);
-    colorWarpablePlatforms();
+    // hud.setDebugMsg(controller.landed);
     calculateHealth();
     if (!gameOver && !controller.justWarped && controller.fallDistance > 0) {
         hud.addFallDistanceToScore(controller.fallDistance);

@@ -4,8 +4,9 @@
 import { Vector3, Raycaster } from 'three';
 import { TWEEN } from 'three/examples/jsm/libs/tween.module.min.js';
 
-// size of player's body
+// constants
 const BODY_SIZE = 2;
+const WARPABLE_DIST = 20;
 
 // Controller class
 class Controller {
@@ -100,7 +101,7 @@ class Controller {
 
         this.document.addEventListener('keydown', onKeyDown);
         this.document.addEventListener('keyup', onKeyUp);
-        // this.document.addEventListener('mousedown', this.warp.bind(this));
+        this.document.addEventListener('mousedown', this.warp.bind(this));
 
         // Initialize raycasters
         this.initializeRaycasters();
@@ -197,7 +198,7 @@ class Controller {
     }
 
     warp() {
-        if (this.controls.isLocked) {
+        if (this.controls.isLocked && this.landed) {
             this.warping = true;
             let rc = this.warpRaycaster;
             let objs = this.scene.platforms.collision;
@@ -206,7 +207,7 @@ class Controller {
                 let p = intersects[0].object;
                 let pPos = p.position;
                 let currPos = this.controls.getObject().position;
-                if (p.warpable && Math.abs(currPos.y - pPos.y) < 20) {
+                if (p.warpable && Math.abs(currPos.y - pPos.y) < WARPABLE_DIST) {
                     let warpTween = new TWEEN.Tween(this.controls.getObject().position)
                     .to({
                         x: p.position.x,
@@ -219,6 +220,7 @@ class Controller {
                         this.landedHeight = p.position.y + 3.5;
                         this.landed = true;
                         this.warping = false;
+                        this.scene.platformsObj.updateWarpablePlatforms(currPos, WARPABLE_DIST);
                     });
                     return true;
                 }
@@ -234,6 +236,8 @@ class Controller {
     }
 
     update(timeStamp) {
+        let player = this.controls.getObject();
+
         if (this.prevTimestamp == -1) {
             this.prevTimestamp = timeStamp;
         }
@@ -251,10 +255,10 @@ class Controller {
             }
         }
 
-        if (intersects.length > 0) {
+        if (intersects.length > 0) {;
             let obj = intersects[0].object;
 
-            if (obj.warpable) {
+            if (obj.warpable && Math.abs(obj.position.y - player.position.y) < WARPABLE_DIST) {
                 this.document.querySelector("#crosshair img").style.filter = "none";
                 let main = obj.main;
                 main.updateHighlightedPlatform();
@@ -270,7 +274,6 @@ class Controller {
 
         if (this.controls.isLocked) {
             const delta = (timeStamp - this.prevTimestamp) / 1000;
-            let player = this.controls.getObject();
 
             this.velocity.x -= this.velocity.x * 10.0 * delta;
             this.velocity.z -= this.velocity.z * 10.0 * delta;
@@ -287,7 +290,7 @@ class Controller {
             }
 
             // gravity
-            this.velocity.y -= 9.8 * 10.0 * delta; // Mass = 30.0
+            this.velocity.y -= 9.8 * 10.0 * delta;
 
             // intersection - bottom
             this.updateRaycasters();
@@ -311,6 +314,10 @@ class Controller {
                         intersect.object.health = false;
                         intersect.object.main.updateNormalPlatform();
                     }
+
+                    // show warpable platforms after landing
+                    this.scene.platformsObj.updateWarpablePlatforms(player.position, WARPABLE_DIST);
+
                 }
             } else if (intersects.length == 0) {
                 this.landed = false;

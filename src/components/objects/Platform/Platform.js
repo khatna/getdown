@@ -127,26 +127,36 @@ class Platform extends Group {
     }
 
     updateHighlightedPlatform() {
-        this.children[0].children[2].material.color.setHex(0xFFFFFF);
+        if (!this.collapsing) {
+            this.children[0].children[2].material.color.setHex(0xFFFFFF);
+        }
     }
 
     updateUnhighlightedPlatform() {
-        this.children[0].children[2].material.color.setHex(0x000000);
+        if (!this.collapsing) {
+            this.children[0].children[2].material.color.setHex(0x000000);
+        }
     }
 
     updateWarpablePlatform() {
-        this.children[0].children[0].material.color.setHex(0xFF595E);
+        if (!this.collapsing) {
+            this.children[0].children[0].material.color.setHex(0xFF595E);
+        }
     }
 
     updateHealthPlatform() {
-        this.children[0].children[0].material.color.setHex(0x8AC926);
-        let img = new TextureLoader().load('/src/components/assets/plus.png');
-        this.children[0].children[1].material = new MeshStandardMaterial({color: 0xffffff, side: FrontSide, map: img});
+        if (!this.collapsing) {
+            this.children[0].children[0].material.color.setHex(0x8AC926);
+            let img = new TextureLoader().load('/src/components/assets/plus.png');
+            this.children[0].children[1].material = new MeshStandardMaterial({color: 0xffffff, side: FrontSide, map: img});
+        }
     }
 
     updateNormalPlatform() {
-        this.children[0].children[0].material.color.setHex(0xFFCA3A);
-        this.children[0].children[1].material = new MeshStandardMaterial({color: 0xffffff, side: FrontSide});
+        if (!this.collapsing) {
+            this.children[0].children[0].material.color.setHex(0xFFCA3A);
+            this.children[0].children[1].material = new MeshStandardMaterial({color: 0xffffff, side: FrontSide});
+        }
     }
 }
 
