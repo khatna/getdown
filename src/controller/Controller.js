@@ -31,6 +31,7 @@ class Controller {
         this.warping = false;
         this.landedHeight = null;
         this.justWarped = false;
+        this.highlightedPlatform = null;
 
         // Keyboard controls
         const onKeyDown = event => {
@@ -241,10 +242,23 @@ class Controller {
         let rc = this.warpRaycaster;
         let objs = this.scene.platforms.collision;
         let intersects = rc.intersectObjects(objs);
+
+        // check if previously highlighted platform is no longer highlighted
+        if (intersects.length == 0 && this.highlightedPlatform != null) {
+            if (!intersects.some(obj => obj.uuid === this.highlightedPlatform.uuid)) {
+                this.highlightedPlatform.main.updateUnhighlightedPlatform();
+                this.highlightedPlatform = null;
+            }
+        }
+
         if (intersects.length > 0) {
             let obj = intersects[0].object;
+
             if (obj.warpable) {
                 this.document.querySelector("#crosshair img").style.filter = "none";
+                let main = obj.main;
+                main.updateHighlightedPlatform();
+                this.highlightedPlatform = obj;
             }
             else {
                 this.document.querySelector("#crosshair img").style.filter = "grayscale(100%)";

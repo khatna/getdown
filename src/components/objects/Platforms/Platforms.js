@@ -118,7 +118,10 @@ class Platforms extends Group {
                 );
                 platformCollision.updateMatrixWorld();
                 platformSpace.updateMatrixWorld();
+                
+                platformCollision.main = platformMain;
                 platformCollision.warpable = warpable;
+                platformCollision.health = health;
 
                 if (warpable) {
                     platformMain.updateWarpablePlatform();
@@ -185,7 +188,7 @@ class Platforms extends Group {
                     if (Math.random() < this.warpableProb) {
                         warpable = true;
                     } 
-                    else if (Math.random() < this.healthProb) {
+                    else if (Math.random() < this.healthProb && this.initialized) {
                         health = true;
                     }
 
