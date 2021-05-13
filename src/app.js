@@ -131,6 +131,7 @@ const onAnimationFrameHandler = (timeStamp) => {
     colorWarpablePlatforms();
     calculateHealth();
     if (!gameOver && !controller.justWarped && controller.fallDistance > 0) {
+        console.log("did NOT warp");
         hud.addFallDistanceToScore(controller.fallDistance);
     }
     controller.fallDistance = 0;
