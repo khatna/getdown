@@ -58,7 +58,7 @@ class Hud {
 
         // Crosshair
         $('body').append($(
-            '<div id="crosshair"><img src="/src/components/assets/crosshair.png" alt="crosshair"></div>'
+            '<div id="crosshair"><img src="/src/components/assets/crosshairRed.png" alt="crosshair"></div>'
         ));
 
     }

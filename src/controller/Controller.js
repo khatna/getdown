@@ -237,6 +237,22 @@ class Controller {
             this.prevTimestamp = timeStamp;
         }
 
+        let rc = this.warpRaycaster;
+        let objs = this.scene.platforms.collision;
+        let intersects = rc.intersectObjects(objs);
+        if (intersects.length > 0) {
+            let obj = intersects[0].object;
+            if (obj.warpable) {
+                this.document.querySelector("#crosshair img").style.filter = "none";
+            }
+            else {
+                this.document.querySelector("#crosshair img").style.filter = "grayscale(100%)";
+            }
+        }
+        else {
+            this.document.querySelector("#crosshair img").style.filter = "grayscale(100%)";
+        }
+
         if (this.controls.isLocked) {
             const delta = (timeStamp - this.prevTimestamp) / 1000;
             let player = this.controls.getObject();
@@ -274,7 +290,6 @@ class Controller {
                     this.landedHeight = player.position.y;
                     this.landed = true;
                     this.justWarped = this.warping;
-                    console.log("landed");
                 }
             } else if (intersects.length == 0) {
                 this.landed = false;
