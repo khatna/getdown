@@ -30,6 +30,7 @@ class Controller {
         this.fallDistance = 0;
         this.warping = false;
         this.landedHeight = null;
+        this.justWarped = false;
 
         // Keyboard controls
         const onKeyDown = event => {
@@ -144,7 +145,7 @@ class Controller {
         this.warpRaycaster = new Raycaster(
             this.controls.getObject().position,
             new Vector3(),
-            0, 50
+            0
         );
     }
 
@@ -202,7 +203,9 @@ class Controller {
             let intersects = rc.intersectObjects(objs);
             if (intersects.length > 0) {
                 let p = intersects[0].object;
-                if (p.warpable) {
+                let pPos = p.position;
+                let currPos = this.controls.getObject().position;
+                if (p.warpable && Math.abs(currPos.y - pPos.y) < 20) {
                     let warpTween = new TWEEN.Tween(this.controls.getObject().position)
                     .to({
                         x: p.position.x,
@@ -270,6 +273,8 @@ class Controller {
                     this.fallDistance = this.landedHeight - player.position.y;
                     this.landedHeight = player.position.y;
                     this.landed = true;
+                    this.justWarped = this.warping;
+                    console.log("landed");
                 }
             } else if (intersects.length == 0) {
                 this.landed = false;
