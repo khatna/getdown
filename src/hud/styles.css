@@ -88,6 +88,10 @@ body {
     background-color: red;
 }
 
+#health-up {
+    background-color: #43CC47;
+}
+
 #crosshair {
     position: absolute;
     top: 50%;

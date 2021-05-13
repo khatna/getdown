@@ -105,6 +105,12 @@ const calculateHealth = () => {
     if (health == 0) {
         gameOver = true;
         hud.gameOver();
+        return;
+    }
+    // Health up
+    if (controller.healthUp) {
+        health += 0.3;
+        hud.setHealthUpCoverOpacity(0.5);
     }
 }
 

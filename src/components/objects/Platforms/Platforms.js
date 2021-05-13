@@ -33,7 +33,7 @@ class Platforms extends Group {
         this.spawnMoreTriggerY = -100;
         this.spawnIntervalY = 50;
         this.warpableProb = 0.3;
-        this.healthProb = 0.05;
+        this.healthProb = 0.1;
 
         this.controls = controls;
         this.ceiling = ceiling;

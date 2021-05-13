@@ -56,6 +56,12 @@ class Hud {
         ));
         $("#damage").hide();
 
+        // Health-up cover
+        $('body').append($(
+            '<div id="health-up" class="cover"></div>'
+        ));
+        $("#health-up").hide();
+
         // Crosshair
         $('body').append($(
             '<div id="crosshair"><img src="/src/components/assets/crosshairRed.png" alt="crosshair"></div>'
@@ -103,8 +109,8 @@ class Hud {
 
     updateHealth(health) {
         health *= 100;
-        let colorTop = "rgba(58,255,0,1)";
-        let colorBottom = "rgba(13,140,0,1)";
+        let colorTop = "rgba(67,204,71,1)";
+        let colorBottom = "rgba(30,109,32,1)";
         let colorBack = "rgba(77,77,77,1)";
         $('#health').css(
             'background',
@@ -158,6 +164,12 @@ class Hud {
         $("#damage").css("opacity", opacity);
         $("#damage").show();
         $("#damage").fadeOut();
+    }
+
+    setHealthUpCoverOpacity(opacity) {
+        $("#health-up").css("opacity", opacity);
+        $("#health-up").show();
+        $("#health-up").fadeOut();
     }
 }
 

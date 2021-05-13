@@ -33,6 +33,7 @@ class Controller {
         this.landedHeight = null;
         this.justWarped = false;
         this.highlightedPlatform = null;
+        this.healthUp = false;
 
         // Keyboard controls
         const onKeyDown = event => {
@@ -304,6 +305,7 @@ class Controller {
                 if (this.landedHeight === null) {
                     this.landedHeight = player.position.y;
                 }
+                this.healthUp = false;
                 if (!this.landed) {
                     this.fallDistance = this.landedHeight - player.position.y;
                     this.landedHeight = player.position.y;
@@ -313,6 +315,7 @@ class Controller {
                     if (intersect.object.health) {
                         intersect.object.health = false;
                         intersect.object.main.updateNormalPlatform();
+                        this.healthUp = true;
                     }
 
                     // show warpable platforms after landing
