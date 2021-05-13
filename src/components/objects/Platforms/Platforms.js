@@ -32,7 +32,7 @@ class Platforms extends Group {
         this.spawnUntilY = -500;
         this.spawnMoreTriggerY = -100;
         this.spawnIntervalY = 50;
-        this.warpableProb = 0.2;
+        this.warpableProb = 0.3;
         this.healthProb = 0.05;
 
         this.controls = controls;
@@ -168,7 +168,6 @@ class Platforms extends Group {
                         false
                     );
                 } else {
-
                     this.spawnPlatform(0, 0, 0, 0, 0, 0, false, false);
                 }
             }
@@ -208,8 +207,7 @@ class Platforms extends Group {
                     // platforms are either warpable or health platforms, not both
                     if (Math.random() < this.warpableProb) {
                         warpable = true;
-                    } 
-                    else if (Math.random() < this.healthProb) {
+                    } else if (Math.random() < this.healthProb) {
                         health = true;
                     }
 

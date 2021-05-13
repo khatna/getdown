@@ -72,6 +72,7 @@ controls.addEventListener('lock', function () {
     hud.resumeGame();
     pause = false;
     prevTimeStamp = null;
+    scene.removeTutorial();
     window.requestAnimationFrame(onAnimationFrameHandler);
 });
 
@@ -135,7 +136,7 @@ const onAnimationFrameHandler = (timeStamp) => {
     }
     hud.setFallingCoverOpacity(Math.max(0, Math.min(
         1, (controller.landedHeight - controls.getObject().position.y - fallDamageThreshold) / 150)));
-    if (!pause || !scene.ceiling.loaded) {
+    if (!pause || !scene.ceiling.loaded || !scene.tutorial.loaded) {
         window.requestAnimationFrame(onAnimationFrameHandler);
     }
 };

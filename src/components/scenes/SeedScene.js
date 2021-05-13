@@ -10,6 +10,7 @@ import { Cylinders } from '../objects/Cylinders';
 import { Platforms } from '../objects/Platforms';
 import { Ceiling } from '../objects/Ceiling';
 import { Particles } from '../objects/Particles';
+import { Tutorial } from '../objects/Tutorial';
 
 class SeedScene extends Scene {
     constructor(controls, renderer, camera) {
@@ -54,12 +55,21 @@ class SeedScene extends Scene {
         this.add(particles);
         this.addToUpdateList(particles);
 
+        // Tutorial
+        const tutorial = new Tutorial();
+        this.add(tutorial);
+        this.tutorial = tutorial;
+
         // Populate GUI
         // this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
     }
 
     addToUpdateList(object) {
         this.state.updateList.push(object);
+    }
+
+    removeTutorial() {
+        this.remove(this.tutorial);
     }
 
     update(timeStamp) {
