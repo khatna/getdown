@@ -274,7 +274,6 @@ class Controller {
                     this.landedHeight = player.position.y;
                     this.landed = true;
                     this.justWarped = this.warping;
-                    console.log("landed");
                 }
             } else if (intersects.length == 0) {
                 this.landed = false;
