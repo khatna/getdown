@@ -293,7 +293,8 @@ class Controller {
             this.updateRaycasters();
             let intersects = this.getIntersections();
             if (intersects.length > 0 && this.velocity.y < 0) {
-                let dist = intersects[0].distance;
+                let intersect = intersects[0];
+                let dist = intersect.distance;
                 let diff = 3 - dist;
                 player.position.y += diff;
                 this.velocity.y = 0;
@@ -305,6 +306,11 @@ class Controller {
                     this.landedHeight = player.position.y;
                     this.landed = true;
                     this.justWarped = this.warping;
+
+                    if (intersect.object.health) {
+                        intersect.object.health = false;
+                        intersect.object.main.updateNormalPlatform();
+                    }
                 }
             } else if (intersects.length == 0) {
                 this.landed = false;

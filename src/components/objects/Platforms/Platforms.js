@@ -188,7 +188,7 @@ class Platforms extends Group {
                     if (Math.random() < this.warpableProb) {
                         warpable = true;
                     } 
-                    else if (Math.random() < this.healthProb && this.initialized) {
+                    else if (Math.random() < this.healthProb) {
                         health = true;
                     }
 
