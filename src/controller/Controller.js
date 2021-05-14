@@ -34,6 +34,7 @@ class Controller {
         this.justWarped = false;
         this.highlightedPlatform = null;
         this.healthUp = false;
+        this.updateCounter = 0;
 
         // Keyboard controls
         const onKeyDown = event => {
@@ -107,7 +108,6 @@ class Controller {
         // Initialize raycasters
         this.initializeRaycasters();
 
-        this.scene.platformsObj.updateWarpablePlatforms(this.controls.getObject().position, WARPABLE_DIST, null);
     }
 
     initializeRaycasters() {
@@ -155,7 +155,7 @@ class Controller {
     }
 
     // update the origin of each raycaster properly
-    updateRaycasters() {
+    updateRaycasters(minFar) {
         // collision raycasters
         for (let i = 0; i < 2; i++) {
             for (let j = 0; j < 2; j++) {
@@ -169,6 +169,7 @@ class Controller {
                 brc.ray.origin.z += dz;
                 trc.ray.origin.x += dx;
                 trc.ray.origin.z += dz;
+                brc.far = Math.max(5, minFar);
             }
         }
 
@@ -245,6 +246,10 @@ class Controller {
             this.prevTimestamp = timeStamp;
         }
 
+        if (this.updateCounter == 1) {
+            this.scene.platformsObj.updateWarpablePlatforms(this.controls.getObject().position, WARPABLE_DIST, null);
+        }
+
         // check if crosshair is on warpable platform, color accordingly
         let rc = this.warpRaycaster;
         let objs = this.scene.platforms.collision;
@@ -296,7 +301,7 @@ class Controller {
             this.velocity.y -= 9.8 * 10.0 * delta;
 
             // intersection - bottom
-            this.updateRaycasters();
+            this.updateRaycasters(-this.velocity.y * delta);
             let intersects = this.getIntersections();
             if (intersects.length > 0 && this.velocity.y < 0) {
                 let intersect = intersects[0];
@@ -353,6 +358,8 @@ class Controller {
 
             return;
         }
+
+        this.updateCounter += 1;
     }
 }
 
