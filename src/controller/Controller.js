@@ -344,6 +344,8 @@ class Controller {
 
                 }
             } else if (intersects.length == 0) {
+                if (this.highlightedPlatform)
+                    this.highlightedPlatform.main.updateUnhighlightedPlatform();
                 this.landed = false;
             }
 
