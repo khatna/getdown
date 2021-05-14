@@ -69,6 +69,7 @@ class Platform extends Group {
         this.add(group);
 
         this.collapsing = false;
+        this.health = false;
     }
 
     collapse(timeStamp) {
@@ -144,11 +145,18 @@ class Platform extends Group {
         }
     }
 
+    resetWarpablePlatform() {
+        if (!this.collapsing && !this.health) {
+            this.children[0].children[0].material.color.setHex(0xFFCA3A);
+        }
+    }
+
     updateHealthPlatform() {
         if (!this.collapsing) {
             this.children[0].children[0].material.color.setHex(0x8AC926);
             let img = new TextureLoader().load('/src/components/assets/plus.png');
             this.children[0].children[1].material = new MeshStandardMaterial({color: 0xffffff, side: FrontSide, map: img});
+            this.health = true;
         }
     }
 
@@ -156,6 +164,7 @@ class Platform extends Group {
         if (!this.collapsing) {
             this.children[0].children[0].material.color.setHex(0xFFCA3A);
             this.children[0].children[1].material = new MeshStandardMaterial({color: 0xffffff, side: FrontSide});
+            this.health = false;
         }
     }
 }

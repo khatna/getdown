@@ -142,12 +142,18 @@ class Platforms extends Group {
         return null;
     }
 
-    updateWarpablePlatforms(position, dist) {
+    updateWarpablePlatforms(position, dist, current) {
         let platforms = this.warpablePlatforms;
         let collisions = this.warpableCollisions;
         for (let i = 0; i < platforms.length; i++) {
-            if (collisions[i].warpable && Math.abs(position.y - collisions[i].position.y) < dist) {
+            if (
+                collisions[i].warpable &&
+                (current === null || collisions[i] != current) &&
+                Math.abs(position.y - collisions[i].position.y) < dist
+            ) {
                 platforms[i].updateWarpablePlatform();
+            } else {
+                platforms[i].resetWarpablePlatform();
             }
         }
     }

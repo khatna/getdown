@@ -106,6 +106,8 @@ class Controller {
 
         // Initialize raycasters
         this.initializeRaycasters();
+
+        this.scene.platformsObj.updateWarpablePlatforms(this.controls.getObject().position, WARPABLE_DIST, null);
     }
 
     initializeRaycasters() {
@@ -200,7 +202,6 @@ class Controller {
 
     warp() {
         if (this.controls.isLocked && this.landed) {
-            this.warping = true;
             let rc = this.warpRaycaster;
             let objs = this.scene.platforms.collision;
             let intersects = rc.intersectObjects(objs);
@@ -209,6 +210,7 @@ class Controller {
                 let pPos = p.position;
                 let currPos = this.controls.getObject().position;
                 if (p.warpable && Math.abs(currPos.y - pPos.y) < WARPABLE_DIST) {
+                    this.warping = true;
                     let warpTween = new TWEEN.Tween(this.controls.getObject().position)
                     .to({
                         x: p.position.x,
@@ -221,7 +223,7 @@ class Controller {
                         this.landedHeight = p.position.y + 3.5;
                         this.landed = true;
                         this.warping = false;
-                        this.scene.platformsObj.updateWarpablePlatforms(currPos, WARPABLE_DIST);
+                        this.scene.platformsObj.updateWarpablePlatforms(currPos, WARPABLE_DIST, p);
                     });
                     return true;
                 }
@@ -319,7 +321,7 @@ class Controller {
                     }
 
                     // show warpable platforms after landing
-                    this.scene.platformsObj.updateWarpablePlatforms(player.position, WARPABLE_DIST);
+                    this.scene.platformsObj.updateWarpablePlatforms(player.position, WARPABLE_DIST, intersect.object);
 
                 }
             } else if (intersects.length == 0) {

@@ -53,8 +53,10 @@ const hud = new Hud();
 document.body.addEventListener('mousedown', function () {
     if (pause) {
         controls.lock();
-    } else if (!controller.warp()) {
-        controller.jump();
+    } else if (!gameOver) {
+        if (!controller.warp()) {
+            controller.jump();
+        }
     }
 });
 
@@ -109,8 +111,9 @@ const calculateHealth = () => {
     }
     // Health up
     if (controller.healthUp) {
-        health += 0.3;
-        hud.setHealthUpCoverOpacity(0.5);
+        health = Math.min(1, health + 0.3);
+        if (adjustment == 0)
+            hud.setHealthUpCoverOpacity(0.5);
     }
 }
 
