@@ -35,6 +35,7 @@ class Controller {
         this.highlightedPlatform = null;
         this.healthUp = false;
         this.updateCounter = 0;
+        this.currentPlatform = null;
 
         // Keyboard controls
         const onKeyDown = event => {
@@ -210,7 +211,7 @@ class Controller {
                 let p = intersects[0].object;
                 let pPos = p.position;
                 let currPos = this.controls.getObject().position;
-                if (p.warpable && Math.abs(currPos.y - pPos.y) < WARPABLE_DIST) {
+                if (p.warpable && p !== this.currentPlatform && Math.abs(currPos.y - pPos.y) < WARPABLE_DIST) {
                     this.warping = true;
                     let warpTween = new TWEEN.Tween(this.controls.getObject().position)
                     .to({
@@ -224,7 +225,10 @@ class Controller {
                         this.landedHeight = p.position.y + 3.5;
                         this.landed = true;
                         this.warping = false;
-                        this.scene.platformsObj.updateWarpablePlatforms(currPos, WARPABLE_DIST, p);
+                        this.scene.platformsObj.updateWarpablePlatforms(currPos, WARPABLE_DIST);
+                        // p.main.resetWarpablePlatform();
+                        p.main.updateUnhighlightedPlatform();
+                        this.currentPlatform = p;
                     });
                     return true;
                 }
@@ -237,6 +241,7 @@ class Controller {
         if (!this.jumping && this.landed) this.velocity.y += 40;
         this.jumping = true;
         this.landed = false;
+        // this.scene.platformsObj.resetAllWarpablePlatforms();
     }
 
     update(timeStamp) {
@@ -247,7 +252,7 @@ class Controller {
         }
 
         if (this.updateCounter == 1) {
-            this.scene.platformsObj.updateWarpablePlatforms(this.controls.getObject().position, WARPABLE_DIST, null);
+            this.scene.platformsObj.updateWarpablePlatforms(this.controls.getObject().position, WARPABLE_DIST);
         }
 
         // check if crosshair is on warpable platform, color accordingly
@@ -263,17 +268,22 @@ class Controller {
             }
         }
 
-        if (intersects.length > 0) {;
+        if (this.landed && intersects.length > 0) {
             let obj = intersects[0].object;
 
-            if (obj.warpable && Math.abs(obj.position.y - player.position.y) < WARPABLE_DIST) {
-                this.document.querySelector("#crosshair img").style.filter = "none";
+            if (
+                obj.warpable &&
+                obj !== this.currentPlatform &&
+                Math.abs(obj.position.y - player.position.y) < WARPABLE_DIST
+            ) {
+                this.document.querySelector('#crosshair img').style.filter =
+                    'none';
                 let main = obj.main;
                 main.updateHighlightedPlatform();
                 this.highlightedPlatform = obj;
-            }
-            else {
-                this.document.querySelector("#crosshair img").style.filter = "grayscale(100%)";
+            } else {
+                this.document.querySelector('#crosshair img').style.filter =
+                    'grayscale(100%)';
             }
         }
         else {
@@ -326,7 +336,11 @@ class Controller {
                     }
 
                     // show warpable platforms after landing
-                    this.scene.platformsObj.updateWarpablePlatforms(player.position, WARPABLE_DIST, intersect.object);
+                    this.scene.platformsObj.updateWarpablePlatforms(player.position, WARPABLE_DIST);
+                    // intersect.object.main.resetWarpablePlatform();
+                    intersect.object.main.updateUnhighlightedPlatform();
+                    
+                    this.currentPlatform = intersect.object;
 
                 }
             } else if (intersects.length == 0) {
