@@ -18,12 +18,12 @@ class Platforms extends Group {
 
         // Properties of platforms
         this.playAreaLength = 120;
-        this.platformsPerIteration = 7;
+        this.platformsPerIteration = 5;
         this.minSpawnDistXZ = 10;
         this.maxSpawnDistXZ = 20;
         this.minSpawnDistDown = 10;
         this.maxSpawnDistDown = 80;
-        this.probSpawnBeyondHeightDamage = 0.2;
+        this.probSpawnBeyondHeightDamage = 0.3;
         this.heightDamageThreshold = 30;
         this.maxNumRetries = 5;
         this.platformSpaceLength = 20;
